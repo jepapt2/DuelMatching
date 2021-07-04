@@ -91,6 +91,14 @@ module.exports = {
         explicitSpread: 'ignore',
       },
     ],
+    'prefer-arrow/prefer-arrow-functions': [
+      'error',
+      {
+        disallowPrototype: true,
+        singleReturnOnly: false,
+        classPropertiesAllowed: false,
+      },
+    ],
     'react/react-in-jsx-scope': 'off',
   },
   overrides: [
@@ -108,12 +116,4 @@ module.exports = {
       },
     },
   },
-  'prefer-arrow/prefer-arrow-functions': [
-    'error',
-    {
-      disallowPrototype: true,
-      singleReturnOnly: false,
-      classPropertiesAllowed: false,
-    },
-  ],
 };
