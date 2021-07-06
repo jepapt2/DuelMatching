@@ -1,10 +1,15 @@
 import { FC } from 'react';
-import { Box } from '@chakra-ui/react';
+import { ChakraProvider } from '@chakra-ui/react';
+import { BrowserRouter } from 'react-router-dom';
+import theme from './theme/theme';
+import Router from './router/Router';
 
 const App: FC = () => (
-  <div className="App">
-    <Box bg="secondary">トップページ</Box>
-  </div>
+  <ChakraProvider theme={theme}>
+    <BrowserRouter>
+      <Router />
+    </BrowserRouter>
+  </ChakraProvider>
 );
 
 export default App;

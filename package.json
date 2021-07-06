@@ -17,6 +17,8 @@
     "framer-motion": "^4",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-router": "^5.2.0",
+    "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
     "typescript": "^4.3.5",
     "web-vitals": "^2.1.0"
@@ -59,6 +61,8 @@
   },
   "devDependencies": {
     "@types/prettier": "^2.3.1",
+    "@types/react-router": "^5.1.15",
+    "@types/react-router-dom": "^5.1.7",
     "@types/stylelint": "^13.13.1",
     "@types/testing-library__jest-dom": "^5.14.0",
     "@types/testing-library__user-event": "^4.2.0",
