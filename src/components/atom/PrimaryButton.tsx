@@ -3,13 +3,15 @@ import { memo, VFC } from 'react';
 
 type Props = {
   children: string;
+  onClick: () => void;
 };
 
 const PrimaryButton: VFC<Props> = memo((props) => {
-  const { children } = props;
+  const { children, onClick } = props;
 
   return (
     <Button
+      onClick={onClick}
       bg="link"
       color="head"
       _active={{
