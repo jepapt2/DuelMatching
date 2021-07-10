@@ -1,12 +1,11 @@
-import { Box } from '@chakra-ui/react';
-import { memo, useContext, VFC } from 'react';
-import { AuthContext } from '../providers/AuthContext';
+import { memo, VFC } from 'react';
+import PrimaryButton from '../atom/PrimaryButton';
+import { useLogout } from '../../hooks/useLoginUser';
 
 const Login: VFC = memo(() => {
-  const currentUserId = useContext(AuthContext).currentUser;
-  console.log(currentUserId);
+  const logout = useLogout();
 
-  return <Box>ログイン</Box>;
+  return <PrimaryButton onClick={logout}>ログアウト</PrimaryButton>;
 });
 
 export default Login;

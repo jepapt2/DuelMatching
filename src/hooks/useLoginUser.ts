@@ -25,10 +25,10 @@ export const useLogin: () => (
   return login;
 };
 
-export const logout = (): Promise<void> =>
-  new Promise((resolve, reject) => {
-    auth
-      .signOut()
-      .then(() => resolve())
-      .catch((error) => reject(error));
-  });
+export const useLogout = (): (() => void) => {
+  const logout = () => {
+    void auth.signOut();
+  };
+
+  return logout;
+};
