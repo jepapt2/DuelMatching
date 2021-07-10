@@ -3,8 +3,8 @@ import { memo, useContext, VFC } from 'react';
 import { AuthContext } from '../providers/AuthContext';
 
 const Login: VFC = memo(() => {
-  const context = useContext(AuthContext);
-  console.log(context.currentUser);
+  const currentUserId = useContext(AuthContext).currentUser;
+  console.log(currentUserId);
 
   return <Box>ログイン</Box>;
 });
