@@ -24,10 +24,12 @@ export const AuthProvider: VFC<Props> = ({ children }) => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    auth.onAuthStateChanged((user) => {
+    const unSub = auth.onAuthStateChanged((user) => {
       setCurrentUser(user?.uid);
       setLoading(false);
     });
+
+    return unSub;
   }, []);
 
   return (
