@@ -47,7 +47,7 @@ const Menu: VFC = memo(() => (
           </VStack>
         </Box>
       </Link>
-      <Link to="/">
+      <Link to="/profile/edit">
         <Box w="100%" h="10">
           <VStack spacing={0}>
             <Icon as={FaUser} h="25px" w="25px" color="head" />
