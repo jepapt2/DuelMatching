@@ -4,7 +4,6 @@ import { auth } from '../../firebase';
 
 type AuthContextProps = {
   currentUser: string | null | undefined;
-  loading: boolean;
 };
 
 type Props = {
@@ -14,7 +13,6 @@ type Props = {
 export const AuthContext: React.Context<AuthContextProps> =
   createContext<AuthContextProps>({
     currentUser: undefined,
-    loading: true,
   });
 
 export const AuthProvider: VFC<Props> = ({ children }) => {
@@ -33,7 +31,7 @@ export const AuthProvider: VFC<Props> = ({ children }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ currentUser, loading }}>
+    <AuthContext.Provider value={{ currentUser }}>
       {loading ? <Spinner /> : <>{children}</>}
     </AuthContext.Provider>
   );

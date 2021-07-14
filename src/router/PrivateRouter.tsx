@@ -1,10 +1,12 @@
 import { memo, useContext, VFC } from 'react';
 import { Redirect, Route } from 'react-router-dom';
+
 import { AuthContext } from '../components/providers/AuthContext';
-import Edit from '../components/pages/Edit';
+
 import Login from '../components/pages/Login';
 import Menu from '../components/molecules/Menu';
-import Profile from '../components/pages/Profile';
+
+import ProfileRouter from './PriofileRouter';
 
 const PrivateRouter: VFC = memo(() => {
   const currentUserId = useContext(AuthContext).currentUser;
@@ -16,8 +18,15 @@ const PrivateRouter: VFC = memo(() => {
       ) : (
         <>
           <Route path="/login" component={Login} />
-          <Route path="/users/edit" component={Edit} />
-          <Route path="/profile" component={Profile} />
+          {ProfileRouter.map((route) => (
+            <Route
+              key={route.path}
+              exact={route.exact}
+              path={`/profile${route.path}`}
+            >
+              {route.component}
+            </Route>
+          ))}
           <Menu />
         </>
       )}
