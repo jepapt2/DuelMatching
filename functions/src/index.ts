@@ -19,5 +19,16 @@ export const onCreate = functions.auth.user().onCreate(async (userRecord) => {
   await db.collection('users').doc(userRecord.uid).set({
     name: userRecord.displayName,
     avatar: userRecord.photoURL,
+    created_at: admin.firestore.FieldValue.serverTimestamp(),
+    introduction: '',
+    activity_day: '',
+    activity_time: '',
+    adress: '',
+    age: '',
+    comment: '',
+    favorite: '',
+    header: '',
+    sex: '',
+    play_title: [],
   });
 });

@@ -11597,10 +11597,20 @@ react-focus-lock@2.5.0:
     use-callback-ref "^1.2.1"
     use-sidecar "^1.0.1"
 
+react-hook-form@^7.11.0:
+  version "7.11.0"
+  resolved "https://registry.yarnpkg.com/react-hook-form/-/react-hook-form-7.11.0.tgz#9cae5e21ba1c1a98a40c65cfee07db9e677edc21"
+  integrity sha512-aJVvL5VV6JqUWvwx9fbrhc6La83aQAfXfqQr+TD/sWy3LPdqYBgBIHBt8WAKWzKRm3g29YV2CLfn4wkhNB9b+g==
+
 react-icons@^4.2.0:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/react-icons/-/react-icons-4.2.0.tgz#6dda80c8a8f338ff96a1851424d63083282630d0"
   integrity sha512-rmzEDFt+AVXRzD7zDE21gcxyBizD/3NqjbX6cmViAgdqfJ2UiLer8927/QhhrXQV7dEj/1EGuOTPp7JnLYVJKQ==
+
+react-image-file-resizer@^0.4.7:
+  version "0.4.7"
+  resolved "https://registry.yarnpkg.com/react-image-file-resizer/-/react-image-file-resizer-0.4.7.tgz#74b33a03832c0771c6c03b037bae9ba6baf10703"
+  integrity sha512-Dak7Ecrd6WEV5LjqoRYFI49ASn7eB1VTlrw6dri9HeIMS6aJang4nli6q5xeckEMY+7QwgqgWqAQD5tgkm4bJg==
 
 react-is@^16.6.0, react-is@^16.7.0, react-is@^16.8.1:
   version "16.13.1"

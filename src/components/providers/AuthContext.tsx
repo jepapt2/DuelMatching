@@ -3,7 +3,7 @@ import { Spinner } from '@chakra-ui/react';
 import { auth } from '../../firebase';
 
 type AuthContextProps = {
-  currentUser: string | null | undefined;
+  currentUser: string | undefined;
 };
 
 type Props = {
@@ -16,9 +16,7 @@ export const AuthContext: React.Context<AuthContextProps> =
   });
 
 export const AuthProvider: VFC<Props> = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState<string | null | undefined>(
-    undefined,
-  );
+  const [currentUser, setCurrentUser] = useState<string | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
