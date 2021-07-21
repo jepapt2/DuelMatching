@@ -9,7 +9,7 @@ import Menu from '../components/molecules/Menu';
 import ProfileRouter from './PriofileRouter';
 
 const PrivateRouter: VFC = memo(() => {
-  const currentUserId = useContext(AuthContext).currentUser;
+  const currentUserId = useContext(AuthContext).id;
 
   return (
     <>

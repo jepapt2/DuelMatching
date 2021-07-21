@@ -15,20 +15,20 @@ export const helloWorld = functions.https.onRequest((request, response) => {
   response.send('Hello from Firebase!');
 });
 
-export const onCreate = functions.auth.user().onCreate(async (userRecord) => {
-  await db.collection('users').doc(userRecord.uid).set({
+export const onCreate = functions.auth.user().onCreate((userRecord) => {
+  db.collection('users').doc(userRecord.uid).set({
     name: userRecord.displayName,
     avatar: userRecord.photoURL,
-    created_at: admin.firestore.FieldValue.serverTimestamp(),
+    createdAt: admin.firestore.FieldValue.serverTimestamp(),
     introduction: '',
-    activity_day: '',
-    activity_time: '',
+    activityDay: '',
+    activityTime: '',
     adress: '',
     age: '',
     comment: '',
     favorite: '',
     header: '',
     sex: '',
-    play_title: [],
+    playTitle: [],
   });
 });

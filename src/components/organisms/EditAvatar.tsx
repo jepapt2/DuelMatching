@@ -95,7 +95,7 @@ const EditAvatar: VFC<Props> = memo(({ valueAvatar, userId }) => {
       <Avatar src={avatar || valueAvatar} marginY="10px" marginX="5px" />
 
       <Text color="header" marginBottom="5px" marginX="5px">
-        アバター
+        アイコン
       </Text>
 
       <form onSubmit={onSubmitAvatar}>

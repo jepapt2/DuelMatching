@@ -12,10 +12,11 @@ export const useLogin: () => (
       .signInWithPopup(provider)
       .then((result) => {
         if (
+          // 新規登録か判定
           result.user?.metadata.creationTime ===
           result.user?.metadata.lastSignInTime
         ) {
-          history.push('/login');
+          history.push('/profile/edit');
         } else {
           history.push('/login');
         }
