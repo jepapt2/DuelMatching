@@ -34,8 +34,12 @@ export const AuthProvider: VFC<Props> = memo(({ children }) => {
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const unSub = () => {
-      auth.onAuthStateChanged((user) => {
+    const unSub = auth.onAuthStateChanged((user) => {
+      setCurrentUser({
+        id: user?.uid,
+      });
+      setLoading(false);
+      if (user?.uid) {
         db.collection('users')
           .doc(user?.uid)
           .onSnapshot((doc) => {
@@ -43,6 +47,8 @@ export const AuthProvider: VFC<Props> = memo(({ children }) => {
             let playTitle: string | Array<PlayTitle> = '';
             if (Array.isArray(doc.data()?.playTitle)) {
               playTitle = doc.data()?.playTitle as Array<PlayTitle>;
+            } else if (doc.data()?.playTitle) {
+              playTitle = [];
             } else {
               const stringPlayTitle = doc.data()?.playTitle as string;
               playTitle = stringPlayTitle.split(',') as Array<PlayTitle>;
@@ -53,12 +59,14 @@ export const AuthProvider: VFC<Props> = memo(({ children }) => {
               avatar: data?.avatar,
               playTitle,
             });
-            setLoading(false);
           });
-      });
+      }
+    });
+
+    return () => {
+      unSub();
     };
-    unSub();
-  }, []);
+  }, [currentUser.id]);
 
   return (
     <AuthContext.Provider value={currentUser}>

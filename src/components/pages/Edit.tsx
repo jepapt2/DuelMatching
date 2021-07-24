@@ -61,9 +61,11 @@ const Edit: VFC = memo(() => {
       .doc(userId)
       .onSnapshot((doc) => {
         const data = doc.data() as Omit<User, 'playTitle'>;
-        let playTitle: string | Array<PlayTitle> = '';
+        let playTitle: undefined | Array<PlayTitle> = [];
         if (Array.isArray(doc.data()?.playTitle)) {
           playTitle = doc.data()?.playTitle as Array<PlayTitle>;
+        } else if (doc.data()?.playTitle) {
+          playTitle = undefined;
         } else {
           const stringPlayTitle = doc.data()?.playTitle as string;
           playTitle = stringPlayTitle.split(',') as Array<PlayTitle>;
@@ -192,7 +194,7 @@ const Edit: VFC = memo(() => {
               <Input
                 bg="secondary"
                 id="comment"
-                c={inputValue.comment}
+                defaultValue={inputValue.comment}
                 {...register('comment', {
                   maxLength: { value: 30, message: 'ひとことは30文字までです' },
                 })}
@@ -264,7 +266,7 @@ const Edit: VFC = memo(() => {
                 margin="10px"
                 padding="7px"
               >
-                {inputValue.playTitle?.length && (
+                {!!inputValue.playTitle?.length && (
                   <Wrap spacing="10px">
                     {inputValue.playTitle.map((name) => (
                       <WrapItem key={name}>
@@ -290,8 +292,12 @@ const Edit: VFC = memo(() => {
               <FormLabel htmlFor="adress" marginTop="5px">
                 居住地
               </FormLabel>
-              <Select placeholder="都道府県" {...register('adress')}>
-                <SelectAdress selected={inputValue.adress} />
+              <Select
+                defaultValue={inputValue?.adress}
+                placeholder="都道府県"
+                {...register('adress')}
+              >
+                <SelectAdress />
               </Select>
             </FormControl>
             <FormControl isInvalid={!!errors.activityDay}>

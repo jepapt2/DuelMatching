@@ -1,12 +1,6 @@
 import { memo, VFC } from 'react';
 
-type Props = {
-  selected: string | undefined;
-};
-
-const SelectAdress: VFC<Props> = memo((props) => {
-  const { selected } = props;
-
+const SelectAdress: VFC = memo(() => {
   const adress = [
     '北海道',
     '青森県',
@@ -60,7 +54,7 @@ const SelectAdress: VFC<Props> = memo((props) => {
   return (
     <>
       {adress.map((a) => (
-        <option value={a} selected={selected === a}>
+        <option key={a} value={a}>
           {a}
         </option>
       ))}

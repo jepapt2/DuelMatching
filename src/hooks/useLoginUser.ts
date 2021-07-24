@@ -1,6 +1,6 @@
 import firebase from 'firebase';
 import { useHistory } from 'react-router';
-import { auth } from '../firebase';
+import { auth, db } from '../firebase';
 
 export const useLogin: () => (
   provider: firebase.auth.AuthProvider,
@@ -16,7 +16,13 @@ export const useLogin: () => (
           result.user?.metadata.creationTime ===
           result.user?.metadata.lastSignInTime
         ) {
-          history.push('/profile/edit');
+          db.collection('users')
+            .doc(result.user?.uid)
+            .onSnapshot((doc) => {
+              if (doc.data()) {
+                history.push('/profile/edit');
+              }
+            });
         } else {
           history.push('/login');
         }
