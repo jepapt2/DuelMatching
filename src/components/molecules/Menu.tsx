@@ -27,7 +27,7 @@ const Menu: VFC = memo(() => (
           </VStack>
         </Box>
       </Link>
-      <Link to="/">
+      <Link to="/users">
         <Box w="100%" h="10">
           <VStack spacing={0}>
             <Search2Icon h="25px" w="25px" color="head" />

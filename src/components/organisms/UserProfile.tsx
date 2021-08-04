@@ -20,7 +20,7 @@ import PlayTitle from '../../types/playTitle';
 import ProfileTable from '../molecules/ProfileTable';
 
 type Props = {
-  userId: string;
+  userId?: string;
 };
 
 const UserProfile: VFC<Props> = memo(({ userId }) => {
@@ -77,10 +77,13 @@ const UserProfile: VFC<Props> = memo(({ userId }) => {
 
   return (
     <>
-      <Center>
-        <Img src={value.header} marginTop="10px" />
-      </Center>
-      <Box bg="secondary" paddingY="20px" height="100%">
+      {value.header && (
+        <Center>
+          <Img src={value.header} marginY="10px" />
+        </Center>
+      )}
+
+      <Box bg="secondary" paddingTop="8px" paddingBottom="20px" height="100%">
         <Box
           bg="primary"
           borderRadius="xl"
@@ -94,7 +97,9 @@ const UserProfile: VFC<Props> = memo(({ userId }) => {
                 <Th width="35px" paddingX="10px" paddingY="0">
                   <Avatar src={value.avatar} />
                 </Th>
-                <Th fontSize="lg">{value.name ? value.name : 'unknown'}</Th>
+                <Th fontSize="lg" textTransform="none">
+                  {value.name || 'unknown'}
+                </Th>
               </Tr>
             </Thead>
             {value.comment ? (

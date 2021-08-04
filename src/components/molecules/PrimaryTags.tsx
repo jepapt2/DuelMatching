@@ -5,14 +5,15 @@ import PrimaryTag from '../atom/PrimaryTag';
 
 type Props = {
   playTitle?: Array<PlayTitle>;
+  size: 'sm' | 'md' | 'lg';
 };
 
-const PrimaryTags: VFC<Props> = memo(({ playTitle }) => (
+const PrimaryTags: VFC<Props> = memo(({ playTitle, size }) => (
   <>
     <Wrap>
       {playTitle?.map((tag) => (
         <WrapItem key={tag}>
-          <PrimaryTag>{tag}</PrimaryTag>
+          <PrimaryTag size={size}>{tag}</PrimaryTag>
         </WrapItem>
       ))}
     </Wrap>

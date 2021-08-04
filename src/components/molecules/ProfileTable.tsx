@@ -38,7 +38,7 @@ const ProfileTable: VFC<Props> = memo((props) => {
                 <Tr>
                   <Td>プレイタイトル</Td>
                   <Td>
-                    <PrimaryTags playTitle={playTitle} />
+                    <PrimaryTags playTitle={playTitle} size="md" />
                   </Td>
                 </Tr>
               </Tbody>

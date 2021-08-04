@@ -9,6 +9,7 @@ import {
   Flex,
   Spacer,
   Avatar,
+  AlertStatus,
 } from '@chakra-ui/react';
 import Resizer from 'react-image-file-resizer';
 import { db, storage } from '../../firebase';
@@ -41,27 +42,27 @@ const EditAvatar: VFC<Props> = memo(({ valueAvatar, userId }) => {
     });
 
   const onSubmitAvatar = async () => {
-    let toastMessage = { title: 'アイコンを更新しました', status: 'success' };
+    let toastTitle = 'アイコンを更新しました';
+    let toastStatus: AlertStatus = 'success';
     try {
+      // deta_url形式でアップロード
       await storage.ref(`avatars/${userId}`).putString(avatar, 'data_url');
+      // アップしたurlを受け取ってfirestoreに保存
       const url = (await storage
         .ref('avatars')
         .child(userId)
         .getDownloadURL()) as string;
       await db.collection('users').doc(userId).update({ avatar: url });
     } catch (error) {
-      toastMessage = { title: 'アップロードに失敗しました', status: 'error' };
+      toastTitle = 'アップロードに失敗しました';
+      toastStatus = 'error';
     } finally {
+      // アップロードの結果をトーストで表示
       setAvatar('');
       setFilename('');
       toast({
-        title: toastMessage.title,
-        status: toastMessage.status as
-          | 'success'
-          | 'error'
-          | 'info'
-          | 'warning'
-          | undefined,
+        title: toastTitle,
+        status: toastStatus,
         position: 'top',
         duration: 9000,
         isClosable: true,
@@ -70,11 +71,13 @@ const EditAvatar: VFC<Props> = memo(({ valueAvatar, userId }) => {
   };
 
   const onChangeAvatar = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    // ファイル名表示用
     const fileImage = e.target.files?.[0].name;
     setFilename(fileImage);
     const blobImage = e.target.files?.[0] as Blob;
-
+    // 空ファイルを変換しないように
     if (blobImage !== undefined) {
+      // 画像のみを受け付ける
       if (/image.*/.exec(blobImage.type)) {
         const resizeImage = (await resizeFile(blobImage)) as string;
         setAvatar(resizeImage);

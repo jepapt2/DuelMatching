@@ -62,10 +62,13 @@ const Edit: VFC = memo(() => {
       .onSnapshot((doc) => {
         const data = doc.data() as Omit<User, 'playTitle'>;
         let playTitle: undefined | Array<PlayTitle> = [];
+        // 配列で受け取った時
         if (Array.isArray(doc.data()?.playTitle)) {
           playTitle = doc.data()?.playTitle as Array<PlayTitle>;
+          // 何も入ってなかった時
         } else if (doc.data()?.playTitle) {
           playTitle = undefined;
+          // 文字列で受け取った時
         } else {
           const stringPlayTitle = doc.data()?.playTitle as string;
           playTitle = stringPlayTitle.split(',') as Array<PlayTitle>;
@@ -92,19 +95,6 @@ const Edit: VFC = memo(() => {
     };
   }, [userId]);
 
-  const playTitleButton: Array<PlayTitle> = [
-    '遊戯王',
-    'デュエマ',
-    'ポケカ',
-    'MTG',
-    'ヴァンガード',
-    'ヴァイス',
-    'Z/X',
-    'Lycee',
-    'バディファイト',
-    '遊戯王ラッシュ',
-  ];
-
   let watchPlayTitle = inputValue.playTitle;
 
   const onSetPlayTitle = (t: PlayTitle) => {
@@ -127,6 +117,19 @@ const Edit: VFC = memo(() => {
 
     setValue('playTitle', newPlayTitle);
   };
+
+  const playTitleArray: Array<PlayTitle> = [
+    '遊戯王',
+    'デュエマ',
+    'ポケカ',
+    'MTG',
+    'ヴァンガード',
+    'ヴァイス',
+    'Z/X',
+    'Lycee',
+    'バディファイト',
+    '遊戯王ラッシュ',
+  ];
 
   const resetSetPlayTitle = () => {
     setInputValue({ playTitle: undefined });
@@ -249,7 +252,7 @@ const Edit: VFC = memo(() => {
                 プレイしているタイトル (頻度が高い順で入力)
               </FormLabel>
               <Wrap spacing="15px" marginBottom="15px">
-                {playTitleButton.map((name) => (
+                {playTitleArray.map((name) => (
                   <WrapItem key={name}>
                     <SecondaryButton onClick={() => onSetPlayTitle(name)}>
                       {name}
@@ -270,7 +273,7 @@ const Edit: VFC = memo(() => {
                   <Wrap spacing="10px">
                     {inputValue.playTitle.map((name) => (
                       <WrapItem key={name}>
-                        <PrimaryTag>{name}</PrimaryTag>
+                        <PrimaryTag size="md">{name}</PrimaryTag>
                       </WrapItem>
                     ))}
                   </Wrap>

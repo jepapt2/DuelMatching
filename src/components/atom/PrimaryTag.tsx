@@ -3,15 +3,12 @@ import { memo, VFC } from 'react';
 
 type Props = {
   children: string;
+  size: 'sm' | 'md' | 'lg';
 };
 
-const PrimaryTag: VFC<Props> = memo((props) => {
-  const { children } = props;
-
-  return (
-    <Tag color="primary" bg="link">
-      {children}
-    </Tag>
-  );
-});
+const PrimaryTag: VFC<Props> = memo(({ children, size }) => (
+  <Tag color="primary" bg="link" size={size}>
+    {children}
+  </Tag>
+));
 export default PrimaryTag;

@@ -1,6 +1,7 @@
 import PlayTitle from './playTitle';
 
 type User = {
+  id?: string;
   name?: string;
   avatar?: string;
   header?: string;

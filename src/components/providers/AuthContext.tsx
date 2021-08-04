@@ -8,6 +8,7 @@ type AuthContextProps = {
   id?: string | undefined;
   name?: string | undefined;
   avatar?: string | undefined;
+  adress?: string | undefined;
   playTitle?: PlayTitle[];
 };
 
@@ -20,6 +21,7 @@ export const AuthContext: React.Context<AuthContextProps> =
     id: '',
     name: '',
     avatar: '',
+    adress: '',
     playTitle: [''],
   });
 
@@ -28,6 +30,7 @@ export const AuthProvider: VFC<Props> = memo(({ children }) => {
     id: '',
     name: '',
     avatar: '',
+    adress: '',
     playTitle: [''],
   });
   // const [users, setUsers] = useState<User | undefined>(undefined);
@@ -57,6 +60,7 @@ export const AuthProvider: VFC<Props> = memo(({ children }) => {
               id: user?.uid,
               name: data?.name,
               avatar: data?.avatar,
+              adress: data?.adress,
               playTitle,
             });
           });
