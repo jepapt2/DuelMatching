@@ -10,12 +10,13 @@ type Recruit = {
   place: string;
   point: string;
   start: firebase.firestore.Timestamp;
-  end: firebase.firestore.Timestamp;
+  end?: firebase.firestore.Timestamp;
   limit: firebase.firestore.Timestamp;
   overview?: string;
-  friendOnly: boolean;
+  friendOnly?: boolean;
   memberCount?: number;
-  createdAt: string;
+  full?: boolean;
+  createdAt?: string;
 };
 
 export default Recruit;

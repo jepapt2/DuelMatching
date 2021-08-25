@@ -37,7 +37,7 @@ const Menu: VFC = memo(() => (
           </VStack>
         </Box>
       </Link>
-      <Link to="/">
+      <Link to="/recruits">
         <Box w="100%" h="10">
           <VStack spacing={0}>
             <Icon as={RiFileTextFill} h="25px" w="25px" color="head" />

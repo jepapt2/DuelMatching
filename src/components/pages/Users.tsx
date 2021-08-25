@@ -48,7 +48,6 @@ const Users: VFC = memo(() => {
 
   const { handleSubmit, register } = useForm<User>({ shouldUnregister: false });
 
-  // 最後のidを取得
   const getLast = async () => {
     setLoading(true);
 
@@ -81,7 +80,6 @@ const Users: VFC = memo(() => {
     }
   };
 
-  // リスト取得
   const getUsers = async () => {
     let collection = db.collection('users').orderBy('createdAt', 'desc');
 
@@ -106,9 +104,7 @@ const Users: VFC = memo(() => {
       collection = collection.where('adress', '==', searchValue.adress);
     }
 
-    // lastDateがある場合は初回読み込みではないと判断しstartAfterで追加読み込みする
     if (lastDate) {
-      // リストの最後のidと全てのリストの最後のidが同じ場合は追加読み込みしない
       if (oldestId === userList[userList.length - 1].id) {
         return;
       }

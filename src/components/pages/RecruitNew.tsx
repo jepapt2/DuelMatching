@@ -28,7 +28,6 @@ import viewRecruit from '../../types/viewRecruit';
 
 const RecruitNew: VFC = memo(() => {
   const { id, name, avatar, adress, playTitle } = useContext(AuthContext);
-  // const [loading, setLoading] = useState<boolean>(true);
 
   const history = useHistory();
 
@@ -106,9 +105,6 @@ const RecruitNew: VFC = memo(() => {
 
   return (
     <>
-      {/* {loading ? (
-        <Spinner />
-      ) : ( */}
       <Box marginX="5px">
         <form onSubmit={handleSubmit(onSubmit)}>
           <FormControl isInvalid={!!errors.title}>
@@ -236,7 +232,7 @@ const RecruitNew: VFC = memo(() => {
                 defaultValue={1}
               />
               <Button
-                disabled={watch('recruitNumber') >= 15}
+                disabled={Number(watch('recruitNumber')) >= 15}
                 onClick={() =>
                   setValue('recruitNumber', Number(watch('recruitNumber')) + 1)
                 }
@@ -244,7 +240,7 @@ const RecruitNew: VFC = memo(() => {
                 +
               </Button>
               <Button
-                disabled={watch('recruitNumber') <= 1}
+                disabled={Number(watch('recruitNumber')) <= 1}
                 onClick={() =>
                   setValue('recruitNumber', Number(watch('recruitNumber')) - 1)
                 }
@@ -383,7 +379,7 @@ const RecruitNew: VFC = memo(() => {
               bg: 'link',
             }}
           >
-            更新する
+            募集する
           </Button>
         </form>
       </Box>

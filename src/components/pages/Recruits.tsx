@@ -14,10 +14,8 @@ import {
   AccordionIcon,
   AccordionPanel,
   Container,
-  SimpleGrid,
   Select,
   Button,
-  Input,
   Wrap,
   WrapItem,
   Alert,
@@ -28,51 +26,56 @@ import { memo, useContext, useEffect, useState, VFC } from 'react';
 import { useForm } from 'react-hook-form';
 import InfiniteScroll from 'react-infinite-scroller';
 import { db } from '../../firebase';
+import useDateTime from '../../hooks/useDateTime';
 import PlayTitle from '../../types/playTitle';
-import User from '../../types/user';
+import searchRecruit from '../../types/searchRecruit';
+import viewRecruit from '../../types/viewRecruit';
 import SelectAdress from '../atom/SelectAdress';
-import UserCard from '../molecules/UserCard';
-
+import RecruitCard from '../molecules/RecruitCard';
+import Recruit from '../organisms/Recruit';
 import UserProfile from '../organisms/UserProfile';
 import { AuthContext } from '../providers/AuthContext';
 
 const Recruits: VFC = memo(() => {
   const { adress, playTitle } = useContext(AuthContext);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [userList, setUserList] = useState<User[]>([]);
+  const [recruitsList, setRecruitsList] = useState<viewRecruit[]>([]);
   const [oldestId, setOldestId] = useState('');
   const [lastDate, setLastDate] = useState('');
   const [openId, setOpenId] = useState<string | undefined>('');
+  const [openUserId, setOpenUserId] = useState<string | undefined>('');
   const [loading, setLoading] = useState<boolean>(false);
-  const [searchValue, setSearchValue] = useState<User>({});
+  const [searchValue, setSearchValue] = useState<searchRecruit>({});
+  const viewDateTime = useDateTime();
 
-  const { handleSubmit, register } = useForm<User>({ shouldUnregister: false });
+  const { handleSubmit, register } = useForm<viewRecruit>({
+    shouldUnregister: false,
+  });
 
-  // 最後のidを取得
   const getLast = async () => {
     setLoading(true);
 
-    let collection = db.collection('users').orderBy('createdAt', 'asc');
+    let collection = db.collection('groups').where('full', '==', false);
 
-    if (searchValue.name) {
-      collection = db
-        .collection('users')
-        .orderBy('name')
-        .orderBy('createdAt', 'asc')
-        .startAt(searchValue.name)
-        .endAt(`${searchValue.name}\uf8ff`);
-    }
     if (searchValue.playTitle) {
+      collection = collection.where('playTitle', '==', searchValue.playTitle);
+    }
+
+    if (searchValue.place) {
+      collection = collection.where('place', '==', searchValue.place);
+    }
+
+    if (searchValue.friendOnly) {
       collection = collection.where(
-        'playTitle',
-        'array-contains',
-        searchValue.playTitle,
+        'friendOnly',
+        '==',
+        !!Number(searchValue.friendOnly),
       );
     }
 
-    if (searchValue.adress) {
-      collection = collection.where('adress', '==', searchValue.adress);
-    }
+    collection = collection
+      .orderBy('limit', 'desc')
+      .where('limit', '>', new Date());
 
     const res = collection.limit(1).get();
 
@@ -81,62 +84,61 @@ const Recruits: VFC = memo(() => {
     }
   };
 
-  // リスト取得
   const getUsers = async () => {
-    let collection = db.collection('users').orderBy('createdAt', 'desc');
-
-    if (searchValue.name) {
-      collection = db
-        .collection('users')
-        .orderBy('name')
-        .orderBy('createdAt', 'desc')
-        .startAt(searchValue.name)
-        .endAt(`${searchValue.name}\uf8ff`);
-    }
+    let collection = db.collection('groups').where('full', '==', false);
 
     if (searchValue.playTitle) {
+      collection = collection.where('playTitle', '==', searchValue.playTitle);
+    }
+
+    if (searchValue.place) {
+      collection = collection.where('place', '==', searchValue.place);
+    }
+
+    if (searchValue.friendOnly) {
       collection = collection.where(
-        'playTitle',
-        'array-contains',
-        searchValue.playTitle,
+        'friendOnly',
+        '==',
+        !!Number(searchValue.friendOnly),
       );
     }
 
-    if (searchValue.adress) {
-      collection = collection.where('adress', '==', searchValue.adress);
-    }
+    collection = collection
+      .orderBy('limit', 'asc')
+      .where('limit', '>', new Date());
 
-    // lastDateがある場合は初回読み込みではないと判断しstartAfterで追加読み込みする
     if (lastDate) {
-      // リストの最後のidと全てのリストの最後のidが同じ場合は追加読み込みしない
-      if (oldestId === userList[userList.length - 1].id) {
+      if (oldestId === recruitsList[recruitsList.length - 1]?.id) {
         return;
       }
       collection = collection.startAfter(lastDate);
     }
 
-    const res = await collection.limit(10).get();
+    const res = await collection.limit(5).get();
 
-    const users = res.docs.reduce(
+    const recruits = res.docs.reduce<viewRecruit[]>(
       (acc, doc) => [
         ...acc,
         {
           id: doc.id,
-          name: doc.data().name as string,
-          avatar: doc.data().avatar as string,
-          playTitle: doc.data().playTitle as PlayTitle[],
-          adress: doc.data().adress as string,
-          favorite: doc.data().favorite as string,
-          activityDay: doc.data().activityDay as string,
-          activityTime: doc.data().activityTime as string,
-          comment: doc.data().comment as string,
+          title: doc.data().title as string,
+          playTitle: doc.data().playTitle as PlayTitle,
+          format: (doc.data().format as string) || '',
+          recruitNumber: doc.data().recruitNumber as number,
+          place: doc.data().place as string,
+          point: doc.data().point as string,
+          start: viewDateTime(doc.data().start),
+          end: doc.data().end ? viewDateTime(doc.data().end) : '未定',
+          limit: viewDateTime(doc.data().limit),
+          friendOnly: doc.data().friendOnly as boolean,
+          memberCount: doc.data().memberCount as number,
         },
       ],
-      userList,
+      recruitsList,
     );
 
-    setUserList(users);
-    if (res.docs[0]?.data().id) {
+    setRecruitsList(recruits);
+    if (res.docs[0]?.id) {
       setLastDate(res.docs[res.docs.length - 1].data().createdAt);
     }
     setLoading(false);
@@ -171,17 +173,23 @@ const Recruits: VFC = memo(() => {
     selectPlayTitle = [...playTitle, ...playTitleCheck];
   }
 
-  const onSubmit = (data: User) => {
+  const onSubmit = (data: searchRecruit) => {
     setLoading(true);
-    setUserList([]);
+    setRecruitsList([]);
     setOldestId('');
+    setLastDate('');
     setSearchValue(data);
     window.scrollTo(0, 0);
   };
 
-  const onClickUser = (id?: string) => {
+  const onClickRecruit = (id?: string) => {
     setOpenId(id);
     onOpen();
+  };
+
+  const onCloseModal = () => {
+    setOpenUserId('');
+    onClose();
   };
 
   return (
@@ -215,7 +223,7 @@ const Recruits: VFC = memo(() => {
                       <WrapItem>
                         <Select
                           display="inline-block"
-                          width="130px"
+                          width="140px"
                           bg="secondary"
                           defaultValue={playTitle?.[0]}
                           placeholder="プレイタイトル"
@@ -231,24 +239,26 @@ const Recruits: VFC = memo(() => {
                       <WrapItem>
                         <Select
                           display="inline-block"
-                          width="130px"
+                          width="120px"
                           bg="secondary"
                           defaultValue={adress}
                           placeholder="都道府県"
-                          {...register('adress')}
+                          {...register('place')}
                         >
                           <SelectAdress />
                         </Select>
                       </WrapItem>
                       <WrapItem>
-                        <Input
+                        <Select
                           display="inline-block"
-                          width="250px"
+                          width="145px"
                           bg="secondary"
-                          id="name"
-                          placeholder="名前(前方一致)"
-                          {...register('name')}
-                        />
+                          placeholder="募集範囲"
+                          {...register('friendOnly')}
+                        >
+                          <option value={0}>誰でも</option>
+                          <option value={1}>フレンドのみ</option>
+                        </Select>
                       </WrapItem>
                       <WrapItem>
                         <Button
@@ -276,29 +286,31 @@ const Recruits: VFC = memo(() => {
               </AccordionItem>
             </Accordion>
           </Container>
-          {oldestId ? (
+          <Box height="50px" />
+          {recruitsList.length ? (
             <InfiniteScroll
               pageStart={0}
               loadMore={getUsers}
-              hasMore={oldestId !== userList[userList.length - 1].id}
+              hasMore={oldestId !== recruitsList[recruitsList.length - 1].id}
             >
-              <SimpleGrid columns={2} spacing={3} marginY="50px">
-                {userList.map((user) => (
-                  <UserCard
-                    key={user.id}
-                    onClick={() => onClickUser(user.id)}
-                    id={user.id}
-                    name={user.name}
-                    avatar={user.avatar}
-                    playTitle={user.playTitle}
-                    adress={user.adress}
-                    favorite={user.favorite}
-                    activityDay={user.activityDay}
-                    activityTime={user.activityTime}
-                    comment={user.comment}
-                  />
-                ))}
-              </SimpleGrid>
+              {recruitsList.map((recruit) => (
+                <RecruitCard
+                  id={recruit.id}
+                  key={recruit.id}
+                  title={recruit.title}
+                  onClick={() => onClickRecruit(recruit.id)}
+                  friendOnly={recruit.friendOnly}
+                  playTitle={recruit.playTitle}
+                  format={recruit.format}
+                  place={recruit.place}
+                  point={recruit.point}
+                  start={recruit.start}
+                  end={recruit.end}
+                  limit={recruit.limit}
+                  recruitNumber={recruit.recruitNumber}
+                  memberCount={recruit.memberCount}
+                />
+              ))}
             </InfiniteScroll>
           ) : (
             <Alert status="warning" marginTop="100px">
@@ -310,23 +322,42 @@ const Recruits: VFC = memo(() => {
           <Modal
             blockScrollOnMount={false}
             isOpen={isOpen}
-            onClose={onClose}
+            onClose={onCloseModal}
             size="xl"
           >
             <ModalOverlay />
-            <ModalContent bg="secondary">
-              <Icon
-                as={ArrowBackIcon}
-                boxSize="55px"
-                color="link"
-                onClick={onClose}
-                cursor="pointer"
-              />
+            {openUserId ? (
+              <ModalContent bg="secondary">
+                <Icon
+                  as={ArrowBackIcon}
+                  boxSize="55px"
+                  color="link"
+                  onClick={() => setOpenUserId('')}
+                  cursor="pointer"
+                />
 
-              <ModalBody padding="0">
-                <UserProfile userId={openId} />
-              </ModalBody>
-            </ModalContent>
+                <ModalBody padding="0">
+                  <UserProfile userId={openUserId} />
+                </ModalBody>
+              </ModalContent>
+            ) : (
+              <ModalContent bg="secondary">
+                <Icon
+                  as={ArrowBackIcon}
+                  boxSize="55px"
+                  color="link"
+                  onClick={onClose}
+                  cursor="pointer"
+                />
+
+                <ModalBody padding="0">
+                  <Recruit
+                    recruitId={openId}
+                    onClick={(id: string) => setOpenUserId(id)}
+                  />
+                </ModalBody>
+              </ModalContent>
+            )}
           </Modal>
         </>
       )}
