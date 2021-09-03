@@ -23,6 +23,8 @@ import {
   Alert,
   AlertIcon,
   Icon,
+  Flex,
+  Spacer,
 } from '@chakra-ui/react';
 import { memo, useContext, useEffect, useState, VFC } from 'react';
 import { useForm } from 'react-hook-form';
@@ -31,13 +33,14 @@ import { db } from '../../firebase';
 import PlayTitle from '../../types/playTitle';
 import User from '../../types/user';
 import SelectAdress from '../atom/SelectAdress';
+import FriendButton from '../molecules/FriendButton';
 import UserCard from '../molecules/UserCard';
 
 import UserProfile from '../organisms/UserProfile';
 import { AuthContext } from '../providers/AuthContext';
 
 const Users: VFC = memo(() => {
-  const { adress, playTitle } = useContext(AuthContext);
+  const { id, name, avatar, adress, playTitle } = useContext(AuthContext);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [userList, setUserList] = useState<User[]>([]);
   const [oldestId, setOldestId] = useState('');
@@ -132,7 +135,7 @@ const Users: VFC = memo(() => {
     );
 
     setUserList(users);
-    if (res.docs[0]?.data().id) {
+    if (res.docs[0]?.id) {
       setLastDate(res.docs[res.docs.length - 1].data().createdAt);
     }
     setLoading(false);
@@ -175,8 +178,8 @@ const Users: VFC = memo(() => {
     window.scrollTo(0, 0);
   };
 
-  const onClickUser = (id?: string) => {
-    setOpenId(id);
+  const onClickUser = (userId?: string) => {
+    setOpenId(userId);
     onOpen();
   };
 
@@ -311,13 +314,23 @@ const Users: VFC = memo(() => {
           >
             <ModalOverlay />
             <ModalContent bg="secondary">
-              <Icon
-                as={ArrowBackIcon}
-                boxSize="55px"
-                color="link"
-                onClick={onClose}
-                cursor="pointer"
-              />
+              <Flex>
+                <Icon
+                  as={ArrowBackIcon}
+                  boxSize="55px"
+                  color="link"
+                  onClick={onClose}
+                  cursor="pointer"
+                  display="inline-block"
+                />
+                <Spacer />
+                <FriendButton
+                  sendId={id}
+                  sendName={name}
+                  sendAvatar={avatar}
+                  recId={openId}
+                />
+              </Flex>
 
               <ModalBody padding="0">
                 <UserProfile userId={openId} />

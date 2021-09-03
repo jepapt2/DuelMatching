@@ -40,15 +40,66 @@ export const onCreateUser = functions.auth
   });
 
 export const onCreateRecruit = functions.firestore
-  .document('/groups/{userId}')
-  .onCreate(async (userRecord) => {
+  .document('/groups/{groupId}')
+  .onCreate(async (groupRecord) => {
     const recruitCount = db.collection('counts').doc('groups');
     const getRecruitCount = await recruitCount.get();
     recruitCount.update({ create: admin.firestore.FieldValue.increment(1) });
 
     db.collection('groups')
-      .doc(userRecord.id)
+      .doc(groupRecord.id)
       .update({
         order: getRecruitCount.data()?.create + 1,
+      });
+  });
+
+export const onCreateRequest = functions.firestore
+  .document('/requests/{requestId}')
+  .onCreate(async (requestRecord) => {
+    db.collection('users')
+      .doc(requestRecord.data().recId)
+      .collection('notifications')
+      .doc(`${requestRecord.data().sendId}_friendReq`)
+      .set({
+        type: 'friendRequest',
+        recId: requestRecord.data().sendId,
+        recName: requestRecord.data().sendName,
+        recAvatar: requestRecord.data().sendAvatar,
+        read: false,
+        updateAt: new Date(),
+      });
+  });
+
+export const onUpdateRequest = functions.firestore
+  .document('/requests/{requestId}')
+  .onUpdate(async (requestRecord) => {
+    db.collection('users')
+      .doc(requestRecord.after.data().recId)
+      .collection('notifications')
+      .doc(`${requestRecord.after.data().sendId}_friendReq`)
+      .set({
+        type: 'friendRequest',
+        recId: requestRecord.after.data().sendId,
+        recName: requestRecord.after.data().sendName,
+        recAvatar: requestRecord.after.data().sendAvatar,
+        read: false,
+        updateAt: new Date(),
+      });
+  });
+
+export const onCreateFriend = functions.firestore
+  .document('/users/{userId}/friends/{friendId}')
+  .onCreate(async (userRecord, context) => {
+    db.collection('users')
+      .doc(context.params.userId)
+      .collection('notifications')
+      .doc(`${userRecord.id}_newFriend`)
+      .set({
+        type: 'newFriend',
+        recId: userRecord.id,
+        recName: userRecord.data().name,
+        recAvatar: userRecord.data().avatar,
+        read: false,
+        updateAt: new Date(),
       });
   });
