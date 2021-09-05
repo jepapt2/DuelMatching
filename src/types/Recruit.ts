@@ -3,6 +3,7 @@ import PlayTitle from './playTitle';
 
 type Recruit = {
   id?: string;
+  organizerId: string;
   title: string;
   playTitle: PlayTitle | 'その他';
   format?: string;

@@ -2,6 +2,7 @@ import PlayTitle from './playTitle';
 
 type viewRecruit = {
   id?: string;
+  organizerId?: string;
   title: string;
   playTitle: PlayTitle | 'その他';
   format?: string;

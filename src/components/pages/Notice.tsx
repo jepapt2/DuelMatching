@@ -194,7 +194,7 @@ const Message: VFC = memo(() => {
           ) : (
             <Alert status="warning" marginTop="100px">
               <AlertIcon />
-              該当するユーザはいませんでした
+              通知はまだありません
             </Alert>
           )}
         </>

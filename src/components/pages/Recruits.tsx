@@ -11,7 +11,6 @@ import {
   Accordion,
   AccordionItem,
   AccordionButton,
-  AccordionIcon,
   AccordionPanel,
   Container,
   Select,
@@ -21,10 +20,15 @@ import {
   Alert,
   AlertIcon,
   Icon,
+  AccordionIcon,
+  Text,
+  VStack,
 } from '@chakra-ui/react';
 import { memo, useContext, useEffect, useState, VFC } from 'react';
 import { useForm } from 'react-hook-form';
+import { RiFileEditFill } from 'react-icons/ri';
 import InfiniteScroll from 'react-infinite-scroller';
+import { useHistory } from 'react-router';
 import { db } from '../../firebase';
 import useDateTime from '../../hooks/useDateTime';
 import PlayTitle from '../../types/playTitle';
@@ -37,7 +41,7 @@ import UserProfile from '../organisms/UserProfile';
 import { AuthContext } from '../providers/AuthContext';
 
 const Recruits: VFC = memo(() => {
-  const { adress, playTitle } = useContext(AuthContext);
+  const { id, name, avatar, adress, playTitle } = useContext(AuthContext);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [recruitsList, setRecruitsList] = useState<viewRecruit[]>([]);
   const [oldestId, setOldestId] = useState('');
@@ -47,6 +51,7 @@ const Recruits: VFC = memo(() => {
   const [loading, setLoading] = useState<boolean>(false);
   const [searchValue, setSearchValue] = useState<searchRecruit>({});
   const viewDateTime = useDateTime();
+  const history = useHistory();
 
   const { handleSubmit, register } = useForm<viewRecruit>({
     shouldUnregister: false,
@@ -139,7 +144,7 @@ const Recruits: VFC = memo(() => {
 
     setRecruitsList(recruits);
     if (res.docs[0]?.id) {
-      setLastDate(res.docs[res.docs.length - 1].data().createdAt);
+      setLastDate(res.docs[res.docs.length - 1].data().limit);
     }
     setLoading(false);
   };
@@ -182,8 +187,8 @@ const Recruits: VFC = memo(() => {
     window.scrollTo(0, 0);
   };
 
-  const onClickRecruit = (id?: string) => {
-    setOpenId(id);
+  const onClickRecruit = (openid?: string) => {
+    setOpenId(openid);
     onOpen();
   };
 
@@ -209,14 +214,13 @@ const Recruits: VFC = memo(() => {
           >
             <Accordion allowMultiple bg="primary">
               <AccordionItem>
-                <h2>
-                  <AccordionButton>
-                    <Box flex="1" textAlign="center" color="link">
-                      検索
-                    </Box>
-                    <AccordionIcon />
-                  </AccordionButton>
-                </h2>
+                <AccordionButton justifyContent="center">
+                  <Text width="70px" color="link" display="inline-block">
+                    検索
+                  </Text>
+                  <AccordionIcon />
+                </AccordionButton>
+
                 <AccordionPanel pb={4}>
                   <form onSubmit={handleSubmit(onSubmit)}>
                     <Wrap justify="center">
@@ -286,36 +290,66 @@ const Recruits: VFC = memo(() => {
               </AccordionItem>
             </Accordion>
           </Container>
+          <Container p={0} position="fixed" bottom="0">
+            <VStack
+              spacing={0}
+              align="center"
+              onClick={() => history.push('/recruitnew')}
+              cursor="pointer"
+              bg="link"
+              borderRadius="full"
+              padding="2px"
+              position="absolute"
+              width="50px"
+              height="50px"
+              bottom="60px"
+              right="0"
+            >
+              <Icon
+                as={RiFileEditFill}
+                boxSize="30px"
+                color="primary"
+                display="inline-block"
+              />
+              <Text fontSize="10px" fontWeight="bold" color="primary">
+                作成
+              </Text>
+            </VStack>
+          </Container>
+
           <Box height="50px" />
           {recruitsList.length ? (
-            <InfiniteScroll
-              pageStart={0}
-              loadMore={getUsers}
-              hasMore={oldestId !== recruitsList[recruitsList.length - 1].id}
-            >
-              {recruitsList.map((recruit) => (
-                <RecruitCard
-                  id={recruit.id}
-                  key={recruit.id}
-                  title={recruit.title}
-                  onClick={() => onClickRecruit(recruit.id)}
-                  friendOnly={recruit.friendOnly}
-                  playTitle={recruit.playTitle}
-                  format={recruit.format}
-                  place={recruit.place}
-                  point={recruit.point}
-                  start={recruit.start}
-                  end={recruit.end}
-                  limit={recruit.limit}
-                  recruitNumber={recruit.recruitNumber}
-                  memberCount={recruit.memberCount}
-                />
-              ))}
-            </InfiniteScroll>
+            <>
+              <InfiniteScroll
+                pageStart={0}
+                loadMore={getUsers}
+                hasMore={oldestId !== recruitsList[recruitsList.length - 1].id}
+              >
+                {recruitsList.map((recruit) => (
+                  <RecruitCard
+                    id={recruit.id}
+                    key={recruit.id}
+                    title={recruit.title}
+                    onClick={() => onClickRecruit(recruit.id)}
+                    friendOnly={recruit.friendOnly}
+                    playTitle={recruit.playTitle}
+                    format={recruit.format}
+                    place={recruit.place}
+                    point={recruit.point}
+                    start={recruit.start}
+                    end={recruit.end}
+                    limit={recruit.limit}
+                    recruitNumber={recruit.recruitNumber}
+                    memberCount={recruit.memberCount}
+                  />
+                ))}
+              </InfiniteScroll>
+              <Box height="80px" />
+            </>
           ) : (
             <Alert status="warning" marginTop="100px">
               <AlertIcon />
-              該当するユーザはいませんでした
+              該当する募集はありませんでした
             </Alert>
           )}
 
@@ -352,8 +386,11 @@ const Recruits: VFC = memo(() => {
 
                 <ModalBody padding="0">
                   <Recruit
+                    userId={id}
+                    userName={name}
+                    userAvatar={avatar}
                     recruitId={openId}
-                    onClick={(id: string) => setOpenUserId(id)}
+                    onClick={(clickId: string) => setOpenUserId(clickId)}
                   />
                 </ModalBody>
               </ModalContent>

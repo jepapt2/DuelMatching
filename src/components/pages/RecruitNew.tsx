@@ -89,6 +89,7 @@ const RecruitNew: VFC = memo(() => {
         overview: data.overview || '',
         friendOnly: data.friendOnly,
         memberCount: 0,
+        organizerId: id,
         full: false,
         createdAt: new Date(),
       })

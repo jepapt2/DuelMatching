@@ -7,7 +7,7 @@ import {
   ModalOverlay,
   useDisclosure,
   Spinner,
-  Box,
+  Text,
   Accordion,
   AccordionItem,
   AccordionButton,
@@ -200,14 +200,13 @@ const Users: VFC = memo(() => {
           >
             <Accordion allowMultiple bg="primary">
               <AccordionItem>
-                <h2>
-                  <AccordionButton>
-                    <Box flex="1" textAlign="center" color="link">
-                      検索
-                    </Box>
-                    <AccordionIcon />
-                  </AccordionButton>
-                </h2>
+                <AccordionButton justifyContent="center">
+                  <Text width="70px" color="link" display="inline-block">
+                    検索
+                  </Text>
+                  <AccordionIcon />
+                </AccordionButton>
+
                 <AccordionPanel pb={4}>
                   <form onSubmit={handleSubmit(onSubmit)}>
                     <Wrap justify="center">
