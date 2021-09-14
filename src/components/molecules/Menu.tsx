@@ -17,7 +17,7 @@ const Menu: VFC = memo(() => (
     bg="primary"
   >
     <Grid templateColumns="repeat(4, 1fr)" gap={0}>
-      <Link to="/message">
+      <Link to="/notice">
         <Box w="100%" h="10">
           <VStack spacing={0}>
             <EmailIcon h="25px" w="25px" color="head" />

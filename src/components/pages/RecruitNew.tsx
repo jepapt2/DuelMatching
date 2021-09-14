@@ -92,6 +92,7 @@ const RecruitNew: VFC = memo(() => {
         organizerId: id,
         full: false,
         createdAt: new Date(),
+        cancel: false,
       })
       .then(async (docref) => {
         await db
@@ -99,7 +100,13 @@ const RecruitNew: VFC = memo(() => {
           .doc(docref.id)
           .collection('members')
           .doc(id)
-          .set({ name, avatar, organizer: true });
+          .set({
+            uid: id,
+            name,
+            avatar,
+            organizer: true,
+            createdAt: new Date(),
+          });
         history.push(`/recruit/${docref.id}`);
       });
   };

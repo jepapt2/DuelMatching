@@ -46,6 +46,7 @@ const RecruitProfile: VFC<Props> = memo(
       overview: '',
       friendOnly: false,
       createdAt: '',
+      cancel: false,
     });
     const [limit, setLimit] = useState<number>(0);
     const [friend, setFriend] = useState<boolean>(false);
@@ -80,9 +81,11 @@ const RecruitProfile: VFC<Props> = memo(
             friendOnly: data?.friendOnly,
             memberCount: data?.memberCount,
             full: data?.full,
+            cancel: data?.cancel,
             createdAt: data?.createdAt,
           });
           setLimit(data?.limit.toDate().getTime());
+
           if (data.friendOnly) {
             void db
               .collection('users')
@@ -124,7 +127,15 @@ const RecruitProfile: VFC<Props> = memo(
     }, [recruitId]);
 
     const submitMember = async () => {
-      if (limit < new Date().getTime()) {
+      if (recruit.cancel) {
+        toast({
+          title: '募集はキャンセルされました',
+          status: 'error',
+          position: 'top',
+          duration: 9000,
+          isClosable: true,
+        });
+      } else if (limit < new Date().getTime()) {
         toast({
           title: '期限を過ぎました',
           status: 'error',
@@ -162,7 +173,13 @@ const RecruitProfile: VFC<Props> = memo(
           .doc(recruit.id)
           .collection('members')
           .doc(userId)
-          .set({ name: userName, avatar: userAvatar, organizer: false });
+          .set({
+            uid: userId,
+            name: userName,
+            avatar: userAvatar,
+            organizer: false,
+            createdAt: new Date(),
+          });
         await db
           .collection('groups')
           .doc(recruit.id)
@@ -189,9 +206,60 @@ const RecruitProfile: VFC<Props> = memo(
         });
     };
 
+    const recruitCansel = async () => {
+      await db.collection('groups').doc(recruit.id).update({
+        cancel: true,
+      });
+    };
+
     const submitButton = () => {
+      if (recruit.cancel) {
+        return (
+          <Button
+            marginTop="30px"
+            width="100%"
+            bg="primary"
+            color="red.500"
+            isDisabled
+            marginBottom="100px"
+            _active={{
+              bg: 'link',
+              transform: 'scale(0.98)',
+            }}
+            _focus={{
+              bg: 'link',
+            }}
+            _hover={{
+              bg: 'link',
+            }}
+          >
+            この募集はキャンセルされました
+          </Button>
+        );
+      }
       if (userId === recruit.organizerId) {
-        return <></>;
+        return (
+          <Button
+            marginTop="30px"
+            width="100%"
+            bg="link"
+            color="primary"
+            onClick={recruitCansel}
+            marginBottom="100px"
+            _active={{
+              bg: 'link',
+              transform: 'scale(0.98)',
+            }}
+            _focus={{
+              bg: 'link',
+            }}
+            _hover={{
+              bg: 'link',
+            }}
+          >
+            募集をキャンセルする
+          </Button>
+        );
       }
       if (members.map((obj) => obj.id).includes(userId as string)) {
         return (

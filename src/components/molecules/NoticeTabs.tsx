@@ -12,14 +12,12 @@ const MessageTabs: VFC<Props> = memo((props) => {
 
   return (
     <>
-      <Container position="fixed" top="0" padding="0">
-        <Tabs isFitted variant="enclosed" defaultIndex={index} bg="primary">
-          <TabList>
-            <Tab onClick={() => history.push('/message')}>通知</Tab>
-            <Tab onClick={() => history.push('/message/friend')}>フレンド</Tab>
-            <Tab onClick={() => history.push('/profile/recruit')}>
-              参加済みの募集
-            </Tab>
+      <Container zIndex="1" position="fixed" top="0" padding="0">
+        <Tabs isFitted variant="enclosed" defaultIndex={index}>
+          <TabList bg="primary">
+            <Tab onClick={() => history.push('/notice')}>通知</Tab>
+            <Tab onClick={() => history.push('/friend')}>フレンド</Tab>
+            <Tab onClick={() => history.push('/join')}>参加済みの募集</Tab>
           </TabList>
         </Tabs>
       </Container>

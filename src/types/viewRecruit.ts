@@ -16,6 +16,7 @@ type viewRecruit = {
   friendOnly?: boolean;
   memberCount?: number;
   full?: boolean;
+  cancel?: boolean;
   createdAt?: string;
 };
 

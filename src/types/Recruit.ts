@@ -17,6 +17,7 @@ type Recruit = {
   friendOnly?: boolean;
   memberCount?: number;
   full?: boolean;
+  cancel?: boolean;
   createdAt?: string;
 };
 

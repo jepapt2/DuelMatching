@@ -11,8 +11,10 @@ import Users from '../components/pages/Users';
 import Recruits from '../components/pages/Recruits';
 import RecruitNew from '../components/pages/RecruitNew';
 import RecruitPage from '../components/pages/RecruitPage';
-import MessageRouter from './MessageRouter';
 import UserPage from '../components/pages/UserPage';
+import Notice from '../components/pages/Notice';
+import Friend from '../components/pages/Friend';
+import Join from '../components/pages/Join';
 
 const PrivateRouter: VFC = memo(() => {
   const currentUserId = useContext(AuthContext).id;
@@ -29,20 +31,14 @@ const PrivateRouter: VFC = memo(() => {
           <Route exact path="/recruits" component={Recruits} />
           <Route exact path="/recruitnew" component={RecruitNew} />
           <Route path="/recruit/:id" component={RecruitPage} />
+          <Route path="/notice" component={Notice} />
+          <Route path="/friend" component={Friend} />
+          <Route path="/join" component={Join} />
           {ProfileRouter.map((route) => (
             <Route
               key={route.path}
               exact={route.exact}
               path={`/profile${route.path}`}
-            >
-              {route.component}
-            </Route>
-          ))}
-          {MessageRouter.map((route) => (
-            <Route
-              key={route.path}
-              exact={route.exact}
-              path={`/message${route.path}`}
             >
               {route.component}
             </Route>

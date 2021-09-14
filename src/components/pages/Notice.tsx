@@ -2,7 +2,7 @@ import { memo, useContext, useEffect, useState, VFC } from 'react';
 import { Spinner, VStack, Alert, AlertIcon } from '@chakra-ui/react';
 import InfiniteScroll from 'react-infinite-scroller';
 import { db } from '../../firebase';
-import MessageTabs from '../molecules/MessageTabs';
+import NoticeTabs from '../molecules/NoticeTabs';
 import { AuthContext } from '../providers/AuthContext';
 import Notification from '../../types/notification';
 import FriendRequestNotice from '../molecules/FriendRequestNotice';
@@ -179,7 +179,7 @@ const Message: VFC = memo(() => {
         </>
       ) : (
         <>
-          <MessageTabs index={0} />
+          <NoticeTabs index={0} />
 
           {messageList.length ? (
             <InfiniteScroll
