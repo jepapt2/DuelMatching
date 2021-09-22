@@ -103,3 +103,40 @@ export const onCreateFriend = functions.firestore
         updateAt: new Date(),
       });
   });
+
+export const onCreateChat = functions.firestore
+  .document('/chatRooms/{roomId}/chat/{messageId}')
+  .onCreate(async (userRecord, context) => {
+    const userList = context.params.roomId.split('_');
+
+    const userProfile = await Promise.all(
+      userList.map(async (userId: string, index: number) => {
+        const getUser = await db.collection('users').doc(userId).get();
+        const getProfile = {
+          id: userList[index === 0 ? 1 : 0],
+          name: getUser.data()?.name,
+          avatar: getUser.data()?.avatar,
+        };
+
+        return getProfile;
+      }),
+    );
+
+    userProfile.map((user: any) =>
+      db
+        .collection('users')
+        .doc(user.id)
+        .collection('notifications')
+        .doc(`${context.params.roomId}_newMessage`)
+        .set({
+          type: 'newMessage',
+          roomId: context.params.roomId,
+          recId: user.id,
+          recName: user.name,
+          recAvatar: user.avatar,
+          text: userRecord.data().text,
+          read: user.id === userRecord.data().userId,
+          updateAt: userRecord.data().createdAt,
+        }),
+    );
+  });

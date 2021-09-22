@@ -37,9 +37,9 @@ const NewFriendNotice: VFC<Props> = memo((props) => {
 
   const onClickPermission = async () => {
     await db
-      .collection('messages')
+      .collection('chatRooms')
       .doc(`${id}_${recId}`)
-      .collection('member')
+      .collection('partners')
       .doc(id)
       .get()
       .then(async (first) => {
@@ -47,26 +47,28 @@ const NewFriendNotice: VFC<Props> = memo((props) => {
           history.push(`/chat/${id}_${recId}`);
         } else {
           await db
-            .collection('messages')
+            .collection('chatRooms')
             .doc(`${recId}_${id}`)
+            .collection('partners')
+            .doc(id)
             .get()
             .then(async (second) => {
               if (second.exists) {
                 history.push(`/chat/${recId}_${id}`);
               } else {
                 await db
-                  .collection('messages')
+                  .collection('chatRooms')
                   .doc(`${id}_${recId}`)
-                  .collection('member')
+                  .collection('partners')
                   .doc(id)
                   .set({
                     name,
                     avatar,
                   });
                 await db
-                  .collection('messages')
+                  .collection('chatRooms')
                   .doc(`${id}_${recId}`)
-                  .collection('member')
+                  .collection('partners')
                   .doc(recId)
                   .set({
                     name: recName,

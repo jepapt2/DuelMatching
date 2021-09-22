@@ -29,9 +29,9 @@ const FriendCard: VFC<Props> = memo((props) => {
 
   const onClickMessage = async () => {
     await db
-      .collection('messages')
+      .collection('chatRooms')
       .doc(`${id}_${friendId}`)
-      .collection('member')
+      .collection('partners')
       .doc(id)
       .get()
       .then(async (first) => {
@@ -39,32 +39,35 @@ const FriendCard: VFC<Props> = memo((props) => {
           history.push(`/chat/${id}_${friendId}`);
         } else {
           await db
-            .collection('messages')
+            .collection('chatRooms')
             .doc(`${friendId}_${id}`)
+            .collection('partners')
+            .doc(id)
             .get()
             .then(async (second) => {
               if (second.exists) {
                 history.push(`/chat/${friendId}_${id}`);
               } else {
                 await db
-                  .collection('messages')
+                  .collection('chatRooms')
                   .doc(`${id}_${friendId}`)
-                  .collection('member')
+                  .collection('partners')
                   .doc(id)
                   .set({
                     name,
                     avatar,
                   });
                 await db
-                  .collection('messages')
+                  .collection('chatRooms')
                   .doc(`${id}_${friendId}`)
-                  .collection('member')
+                  .collection('partners')
                   .doc(friendId)
                   .set({
                     name: friendName,
                     avatar: friendAvatar,
                   });
                 history.push(`/chat/${id}_${friendId}`);
+                console.log('a');
               }
             });
         }

@@ -15,6 +15,8 @@ import UserPage from '../components/pages/UserPage';
 import Notice from '../components/pages/Notice';
 import Friend from '../components/pages/Friend';
 import Join from '../components/pages/Join';
+import Chat from '../components/pages/Chat';
+import GroupChat from '../components/pages/GroupChat';
 
 const PrivateRouter: VFC = memo(() => {
   const currentUserId = useContext(AuthContext).id;
@@ -34,6 +36,8 @@ const PrivateRouter: VFC = memo(() => {
           <Route path="/notice" component={Notice} />
           <Route path="/friend" component={Friend} />
           <Route path="/join" component={Join} />
+          <Route path="/chat/:roomId" component={Chat} />
+          <Route path="/chat/:groupId" component={GroupChat} />
           {ProfileRouter.map((route) => (
             <Route
               key={route.path}

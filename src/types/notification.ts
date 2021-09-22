@@ -7,6 +7,7 @@ type Notification = {
   read: boolean;
   updateAt: string;
   text?: string;
+  roomId?: string;
 };
 
 export default Notification;

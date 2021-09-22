@@ -8,6 +8,7 @@ import Notification from '../../types/notification';
 import FriendRequestNotice from '../molecules/FriendRequestNotice';
 import useDateTime from '../../hooks/useDateTime';
 import NewFriendNotice from '../molecules/NewFriendNotice';
+import NewMessageNotice from '../molecules/NewMessageNotice';
 
 const Message: VFC = memo(() => {
   const { id, name, avatar } = useContext(AuthContext);
@@ -74,6 +75,7 @@ const Message: VFC = memo(() => {
           read: doc.data().read as boolean,
           updateAt: viewDateTime(doc.data().updateAt),
           text: doc.data().text as string,
+          roomId: doc.data().roomId as string,
         },
       ],
       messageList,
@@ -99,6 +101,7 @@ const Message: VFC = memo(() => {
                       read: change.doc.data().read as boolean,
                       updateAt: viewDateTime(change.doc.data().updateAt),
                       text: change.doc.data().text as string,
+                      roomId: change.doc.data().roomId as string,
                     },
                     ...prevArray,
                   ]
@@ -112,9 +115,16 @@ const Message: VFC = memo(() => {
                       read: change.doc.data().read as boolean,
                       updateAt: viewDateTime(change.doc.data().updateAt),
                       text: change.doc.data().text as string,
+                      roomId: change.doc.data().roomId as string,
                     },
                   ],
             );
+            setMessageList((prevArray) => [
+              ...prevArray.filter(
+                (element, index, self) =>
+                  self.findIndex((e) => e.id === element.id) === index,
+              ),
+            ]);
           }
         });
       });
@@ -152,6 +162,19 @@ const Message: VFC = memo(() => {
             recAvatar={message.recAvatar}
             read={message.read}
             updateAt={message.updateAt}
+          />
+        );
+      case 'newMessage':
+        return (
+          <NewMessageNotice
+            key={message.id}
+            text={message.text}
+            recId={message.recId}
+            recName={message.recName}
+            recAvatar={message.recAvatar}
+            read={message.read}
+            updateAt={message.updateAt}
+            roomId={message.roomId}
           />
         );
       default:
