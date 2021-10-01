@@ -1,47 +1,29 @@
-import {
-  Avatar,
-  Box,
-  Flex,
-  Spacer,
-  Text,
-  Divider,
-  Icon,
-} from '@chakra-ui/react';
+import { Box, Flex, Spacer, Text, Divider, Icon } from '@chakra-ui/react';
 import { memo, VFC } from 'react';
 import { useHistory } from 'react-router';
 import { GiPlainCircle } from 'react-icons/gi';
 
 type Props = {
   text?: string;
-  recId: string;
   recName: string;
-  recAvatar: string;
   read: boolean;
   updateAt: string;
-  roomId?: string;
+  roomId: string;
 };
 
-const NewMessageNotice: VFC<Props> = memo((props) => {
-  const { text, recId, recName, recAvatar, read, updateAt, roomId } = props;
+const NewGroupMessageNotice: VFC<Props> = memo((props) => {
+  const { text, recName, read, updateAt, roomId } = props;
   const history = useHistory();
 
   return (
     <>
       <Box
-        padding="5px"
+        paddingY="5px"
+        paddingX="10px"
         cursor="pointer"
-        onClick={() => history.push(`/chat/${roomId as string}`)}
+        onClick={() => history.push(`/group/${roomId}`)}
       >
-        <Flex marginBottom="1">
-          <Avatar
-            src={recAvatar}
-            onClick={(e) => {
-              e.stopPropagation();
-              history.push(`/user/${recId}`);
-            }}
-            display="inline-block"
-            zIndex="1"
-          />
+        <Flex marginBottom="2">
           <Box marginLeft="1">
             <Text fontWeight="semibold">{recName}</Text>
             <Text color="gray.600">
@@ -63,4 +45,4 @@ const NewMessageNotice: VFC<Props> = memo((props) => {
     </>
   );
 });
-export default NewMessageNotice;
+export default NewGroupMessageNotice;

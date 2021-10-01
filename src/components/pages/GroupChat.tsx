@@ -4,8 +4,6 @@ import {
   Text,
   Spinner,
   Stack,
-  Alert,
-  AlertIcon,
   Box,
   Container,
   FormControl,
@@ -17,7 +15,6 @@ import {
   PopoverContent,
   PopoverHeader,
   PopoverTrigger,
-  Avatar,
   Spacer,
 } from '@chakra-ui/react';
 import InfiniteScroll from 'react-infinite-scroller';
@@ -31,17 +28,18 @@ import ChatType from '../../types/chat';
 import Member from '../../types/member';
 import useDateTime from '../../hooks/useDateTime';
 import ChatMessageSelf from '../molecules/ChatMessageSelf';
-import ChatMessagePartner from '../molecules/ChatMessagePartner';
+import ChatMessageGroup from '../molecules/ChatMessageGroup';
 
 const GroupChat: VFC = memo(() => {
   const { id } = useContext(AuthContext);
-  const [partners, setPartners] = useState<Member[]>([]);
   const [oldestId, setOldestId] = useState<string>('');
+  const [members, setMembers] = useState<Member[]>([]);
   const [messageList, setMessageList] = useState<ChatType[]>([]);
   const [lastDate, setLastDate] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);
-  const [partnerCheck, setPartnerCheck] = useState<boolean>(false);
-  const { roomId } = useParams<{ roomId: string }>();
+  const [memberCheck, setMemberCheck] = useState<boolean>(false);
+  const [title, setTitle] = useState<string>('');
+  const { groupId } = useParams<{ groupId: string }>();
   const viewDateTime = useDateTime();
   const scrollBottomRef = useRef<HTMLDivElement>(null);
   const history = useHistory();
@@ -52,36 +50,47 @@ const GroupChat: VFC = memo(() => {
     formState: { errors, isSubmitting },
   } = useForm<ChatType>({ shouldUnregister: false });
 
-  const getPartners = async () => {
-    const partnersCollection = await db
-      .collection('chatRooms')
-      .doc(roomId)
-      .collection('partners')
+  const getGroups = async () => {
+    const membersCollection = await db
+      .collection('groups')
+      .doc(groupId)
+      .collection('members')
       .get();
 
-    const partnersList = partnersCollection.docs.map<Member>((doc) => ({
+    const membersList = membersCollection.docs.map<Member>((doc) => ({
       id: doc.id,
       name: doc.data().name as string,
       avatar: doc.data().avatar as string,
     }));
 
-    setPartners(partnersList);
+    setMembers(membersList);
 
-    setPartnerCheck(partnersList.some((user) => user.id === id));
+    await db
+      .collection('groups')
+      .doc(groupId)
+      .get()
+      .then((doc) => {
+        setTitle(doc.data()?.title);
+      });
+
+    setMemberCheck(membersList.some((user) => user.id === id));
+    setLoading(false);
   };
 
-  const setRead = () => {
-    db.collection('users')
+  const setRead = async () => {
+    await db
+      .collection('users')
       .doc(id)
       .collection('notifications')
-      .doc(`${roomId}_newMessage`)
-      .onSnapshot((snapshot) => {
-        if (!snapshot.data()?.read) {
+      .doc(`${groupId}_newGroupMessage`)
+      .get()
+      .then((doc) => {
+        if (doc.exists) {
           void db
             .collection('users')
             .doc(id)
             .collection('notifications')
-            .doc(`${roomId}_newMessage`)
+            .doc(`${groupId}_newGroupMessage`)
             .update({
               read: true,
             });
@@ -91,8 +100,8 @@ const GroupChat: VFC = memo(() => {
 
   const getLast = async () => {
     const collection = db
-      .collection('chatRooms')
-      .doc(roomId)
+      .collection('groups')
+      .doc(groupId)
       .collection('chat')
       .orderBy('createdAt', 'asc');
 
@@ -102,8 +111,8 @@ const GroupChat: VFC = memo(() => {
       setOldestId((await res).docs[0].id);
     }
 
-    db.collection('chatRooms')
-      .doc(roomId)
+    db.collection('groups')
+      .doc(groupId)
       .collection('chat')
       .orderBy('createdAt', 'desc')
       .endBefore(new Date())
@@ -118,8 +127,8 @@ const GroupChat: VFC = memo(() => {
 
   const getMessages = async () => {
     let collection = db
-      .collection('chatRooms')
-      .doc(roomId)
+      .collection('groups')
+      .doc(groupId)
       .collection('chat')
       .orderBy('createdAt', 'desc');
 
@@ -145,8 +154,8 @@ const GroupChat: VFC = memo(() => {
       messageList,
     );
 
-    db.collection('chatRooms')
-      .doc(roomId)
+    db.collection('groups')
+      .doc(groupId)
       .collection('chat')
       .orderBy('createdAt', 'desc')
       .endBefore(new Date())
@@ -182,19 +191,17 @@ const GroupChat: VFC = memo(() => {
     if (res.docs[0]?.id) {
       setLastDate(res.docs[res.docs.length - 1].data().createdAt);
     }
-
-    setLoading(false);
   };
 
   useEffect(() => {
-    void getPartners();
-    setRead();
+    void getGroups();
+    void setRead();
     void getLast();
     void getMessages();
 
     return () => {
-      void getPartners();
-      setRead();
+      void getGroups();
+      void setRead();
       void getLast();
       void getMessages();
     };
@@ -210,7 +217,7 @@ const GroupChat: VFC = memo(() => {
   }, [loading]);
 
   const chatUserProfile = (messageUserId?: string) => {
-    const userProfile = partners.find((user) => user.id !== messageUserId);
+    const userProfile = members.find((user) => user.id === messageUserId);
 
     return userProfile;
   };
@@ -227,9 +234,12 @@ const GroupChat: VFC = memo(() => {
         );
       default:
         return (
-          <ChatMessagePartner
+          <ChatMessageGroup
             key={message.id}
             id={message.id}
+            userId={message.userId}
+            name={chatUserProfile(message.userId)?.name}
+            avatar={chatUserProfile(message.userId)?.avatar}
             text={message.text}
             createdAt={message.createdAt}
           />
@@ -238,7 +248,7 @@ const GroupChat: VFC = memo(() => {
   };
 
   const onSubmit: SubmitHandler<ChatType> = async (data) => {
-    await db.collection('chatRooms').doc(roomId).collection('chat').add({
+    await db.collection('groups').doc(groupId).collection('chat').add({
       userId: id,
       text: data.text,
       createdAt: new Date(),
@@ -254,7 +264,7 @@ const GroupChat: VFC = memo(() => {
         </>
       ) : (
         <>
-          {partnerCheck ? (
+          {memberCheck ? (
             <>
               <Container
                 p={0}
@@ -262,6 +272,7 @@ const GroupChat: VFC = memo(() => {
                 top="0"
                 borderColor="head"
                 bg="primary"
+                zIndex="1"
               >
                 <Flex>
                   <Icon
@@ -273,34 +284,19 @@ const GroupChat: VFC = memo(() => {
                     display="inline-block"
                   />
                   <Spacer />
-                  <Box marginRight="70px">
-                    <Avatar
-                      src={chatUserProfile(id)?.avatar}
-                      onClick={() =>
-                        history.push(
-                          `/user/${chatUserProfile(id)?.id as string}`,
-                        )
-                      }
-                      cursor="pointer"
-                      display="inline-block"
-                    />
-                    <Text
-                      marginLeft="5px"
-                      marginTop="11px"
-                      fontWeight="semibold"
-                      fontSize="lg"
-                      onClick={() =>
-                        history.push(
-                          `/user/${chatUserProfile(id)?.id as string}`,
-                        )
-                      }
-                      cursor="pointer"
-                      display="inline-block"
-                    >
-                      {chatUserProfile(id)?.name}
-                    </Text>
-                  </Box>
-
+                  <Text
+                    marginTop="11px"
+                    fontWeight="semibold"
+                    fontSize="lg"
+                    onClick={() => history.push(`/recruit/${groupId}`)}
+                    cursor="pointer"
+                    display="inline-block"
+                    marginRight="10px"
+                  >
+                    {title && title.length > 10
+                      ? `${title.substr(0, 10)}...`
+                      : title}
+                  </Text>
                   <Spacer />
                 </Flex>
               </Container>
@@ -330,10 +326,7 @@ const GroupChat: VFC = memo(() => {
                   <Box height="110px" />
                 </>
               ) : (
-                <Alert status="warning" marginTop="100px">
-                  <AlertIcon />
-                  通知はまだありません
-                </Alert>
+                <></>
               )}
               <Container
                 p={0}
@@ -400,7 +393,7 @@ const GroupChat: VFC = memo(() => {
               </Container>
             </>
           ) : (
-            <Redirect to="/notice" />
+            <Redirect to="/join" />
           )}
         </>
       )}

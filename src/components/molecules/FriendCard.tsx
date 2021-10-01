@@ -56,6 +56,7 @@ const FriendCard: VFC<Props> = memo((props) => {
                   .set({
                     name,
                     avatar,
+                    uid: id,
                   });
                 await db
                   .collection('chatRooms')
@@ -65,9 +66,9 @@ const FriendCard: VFC<Props> = memo((props) => {
                   .set({
                     name: friendName,
                     avatar: friendAvatar,
+                    uid: friendId,
                   });
                 history.push(`/chat/${id}_${friendId}`);
-                console.log('a');
               }
             });
         }

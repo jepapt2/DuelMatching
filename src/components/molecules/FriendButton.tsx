@@ -125,19 +125,18 @@ const FriendButton: VFC<Props> = memo((props) => {
               marginTop="5px"
               cursor="pointer"
               color="link"
-              bg="link"
-              border="2px"
-              borderRadius="xl"
+              bg="primary"
+              borderRadius="3xl"
               padding="2px"
+              width="75px"
             >
               <Icon
                 as={FaUserMinus}
                 boxSize="25px"
-                color="primary"
                 display="inline-block"
                 marginLeft="8px"
               />
-              <Text fontSize="6px" color="primary" paddingBottom="0">
+              <Text fontSize="xx-small" paddingBottom="0">
                 フレンド削除
               </Text>
             </VStack>
@@ -170,20 +169,19 @@ const FriendButton: VFC<Props> = memo((props) => {
         marginTop="5px"
         onClick={onClickFriendCreate}
         cursor="pointer"
-        color="link"
-        bg="primary"
-        border="2px"
-        borderRadius="xl"
+        bg="link"
+        borderRadius="3xl"
         padding="2px"
+        width="75px"
       >
         <Icon
           as={FaUserPlus}
           boxSize="25px"
-          color="link"
+          color="primary"
           display="inline-block"
           marginLeft="8px"
         />
-        <Text fontSize="6px" color="link">
+        <Text fontSize="xx-small" color="primary">
           フレンド申請
         </Text>
       </VStack>

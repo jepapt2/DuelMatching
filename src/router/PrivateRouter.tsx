@@ -37,7 +37,7 @@ const PrivateRouter: VFC = memo(() => {
           <Route path="/friend" component={Friend} />
           <Route path="/join" component={Join} />
           <Route path="/chat/:roomId" component={Chat} />
-          <Route path="/chat/:groupId" component={GroupChat} />
+          <Route path="/group/:groupId" component={GroupChat} />
           {ProfileRouter.map((route) => (
             <Route
               key={route.path}

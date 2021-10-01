@@ -136,7 +136,130 @@ export const onCreateChat = functions.firestore
           recAvatar: user.avatar,
           text: userRecord.data().text,
           read: user.id === userRecord.data().userId,
-          updateAt: userRecord.data().createdAt,
+          updateAt: new Date(),
         }),
     );
+  });
+
+export const onCreateGroupChat = functions.firestore
+  .document('/groups/{groupId}/chat/{messageId}')
+  .onCreate(async (userRecord, context) => {
+    const groupTitle = await db
+      .collection('groups')
+      .doc(context.params.groupId)
+      .get()
+      .then((doc) => doc.data()?.title as string);
+
+    const getUser = await db
+      .collection('groups')
+      .doc(context.params.groupId)
+      .collection('members')
+      .get();
+    const userId = getUser.docs.map((doc) => doc.id);
+
+    userId.map((id: string) =>
+      db
+        .collection('users')
+        .doc(id)
+        .collection('notifications')
+        .doc(`${context.params.groupId}_newGroupMessage`)
+        .set({
+          type: 'newGroupMessage',
+          roomId: context.params.groupId,
+          recName: `${groupTitle} (${userId.length})`,
+          text: userRecord.data().text,
+          read: id === userRecord.data().userId,
+          updateAt: new Date(),
+        }),
+    );
+  });
+
+export const onCancelRecruit = functions.firestore
+  .document('/groups/{groupId}')
+  .onUpdate(async (change, context) => {
+    if (change.after.data().cancel) {
+      const getUser = await db
+        .collection('groups')
+        .doc(context.params.groupId)
+        .collection('members')
+        .get();
+      const userId = getUser.docs.map((doc) => doc.id);
+
+      userId.map((id: string) =>
+        db
+          .collection('users')
+          .doc(id)
+          .collection('notifications')
+          .doc(`${context.params.groupId}_recruitCancel`)
+          .set({
+            type: 'recruitCancel',
+            roomId: context.params.groupId,
+            recName: change.after.data().title,
+            read: id === change.after.data().organizerId,
+            updateAt: new Date(),
+          }),
+      );
+    }
+  });
+
+export const onJoinMember = functions.firestore
+  .document('/groups/{groupId}/members/{memberId}')
+  .onCreate(async (snap, context) => {
+    await db
+      .collection('groups')
+      .doc(context.params.groupId)
+      .collection('chat')
+      .add({
+        userId: snap.id,
+        text: `${snap.data().name}が参加しました`,
+        createdAt: new Date(),
+      });
+  });
+
+export const onDeleteMember = functions.firestore
+  .document('/groups/{groupId}/members/{memberId}')
+  .onDelete(async (snap, context) => {
+    await db
+      .collection('groups')
+      .doc(context.params.groupId)
+      .collection('chat')
+      .add({
+        userId: snap.id,
+        text: `${snap.data().name}が抜けました`,
+        createdAt: new Date(),
+      });
+  });
+
+export const onChangeUserName = functions.firestore
+  .document('/users/{userId}')
+  .onUpdate(async (change, context) => {
+    if (change.before.data().name !== change.after.data().name) {
+      const batch = db.batch();
+
+      const membersDocref = db
+        .collectionGroup('members')
+        .where('uid', '==', context.params.userId);
+
+      (await membersDocref.get()).docs.map((doc) =>
+        batch.update(doc.ref, { name: change.after.data().name }),
+      );
+
+      const partnersDocref = db
+        .collectionGroup('partners')
+        .where('uid', '==', context.params.userId);
+
+      (await partnersDocref.get()).docs.map((doc) =>
+        batch.update(doc.ref, { name: change.after.data().name }),
+      );
+
+      const friendsDocref = db
+        .collectionGroup('friends')
+        .where('uid', '==', context.params.userId);
+
+      (await friendsDocref.get()).docs.map((doc) =>
+        batch.update(doc.ref, { name: change.after.data().name }),
+      );
+
+      await batch.commit();
+    }
   });

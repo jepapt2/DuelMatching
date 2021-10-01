@@ -4,8 +4,6 @@ import {
   Text,
   Spinner,
   Stack,
-  Alert,
-  AlertIcon,
   Box,
   Container,
   FormControl,
@@ -70,13 +68,15 @@ const Chat: VFC = memo(() => {
     setPartnerCheck(partnersList.some((user) => user.id === id));
   };
 
-  const setRead = () => {
-    db.collection('users')
+  const setRead = async () => {
+    await db
+      .collection('users')
       .doc(id)
       .collection('notifications')
       .doc(`${roomId}_newMessage`)
-      .onSnapshot((snapshot) => {
-        if (!snapshot.data()?.read) {
+      .get()
+      .then((doc) => {
+        if (doc.exists) {
           void db
             .collection('users')
             .doc(id)
@@ -188,13 +188,13 @@ const Chat: VFC = memo(() => {
 
   useEffect(() => {
     void getPartners();
-    setRead();
+    void setRead();
     void getLast();
     void getMessages();
 
     return () => {
       void getPartners();
-      setRead();
+      void setRead();
       void getLast();
       void getMessages();
     };
@@ -330,10 +330,7 @@ const Chat: VFC = memo(() => {
                   <Box height="110px" />
                 </>
               ) : (
-                <Alert status="warning" marginTop="100px">
-                  <AlertIcon />
-                  通知はまだありません
-                </Alert>
+                <></>
               )}
               <Container
                 p={0}

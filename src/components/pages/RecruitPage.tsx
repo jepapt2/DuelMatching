@@ -1,3 +1,5 @@
+import { ArrowBackIcon } from '@chakra-ui/icons';
+import { Flex, Icon, Spacer } from '@chakra-ui/react';
 import { memo, useContext, VFC } from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import Recruit from '../organisms/Recruit';
@@ -10,6 +12,17 @@ const Profile: VFC = memo(() => {
 
   return (
     <>
+      <Flex>
+        <Icon
+          as={ArrowBackIcon}
+          boxSize="50px"
+          color="link"
+          onClick={() => history.goBack()}
+          cursor="pointer"
+          display="inline-block"
+        />
+        <Spacer />
+      </Flex>
       <Recruit
         userId={userId}
         userName={name}

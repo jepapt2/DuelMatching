@@ -1,6 +1,7 @@
 import { memo, useContext, useEffect, useState, VFC } from 'react';
 import { Spinner, VStack, Alert, AlertIcon } from '@chakra-ui/react';
 import InfiniteScroll from 'react-infinite-scroller';
+import { useLocation } from 'react-router-dom';
 import { db } from '../../firebase';
 import NoticeTabs from '../molecules/NoticeTabs';
 import { AuthContext } from '../providers/AuthContext';
@@ -9,6 +10,8 @@ import FriendRequestNotice from '../molecules/FriendRequestNotice';
 import useDateTime from '../../hooks/useDateTime';
 import NewFriendNotice from '../molecules/NewFriendNotice';
 import NewMessageNotice from '../molecules/NewMessageNotice';
+import NewGroupMessageNotice from '../molecules/NewGroupMessageNotice';
+import RecruitCancelNotice from '../molecules/RecruitCancelNotice';
 
 const Message: VFC = memo(() => {
   const { id, name, avatar } = useContext(AuthContext);
@@ -16,6 +19,7 @@ const Message: VFC = memo(() => {
   const [messageList, setMessageList] = useState<Notification[]>([]);
   const [lastDate, setLastDate] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
+  const location = useLocation();
   const viewDateTime = useDateTime();
 
   const getLast = async () => {
@@ -88,6 +92,7 @@ const Message: VFC = memo(() => {
       .endBefore(new Date())
       .onSnapshot((docs) => {
         docs.docChanges().forEach((change) => {
+          setLoading(true);
           if (change.type === 'added') {
             setMessageList((prevArray) =>
               prevArray.length
@@ -119,13 +124,29 @@ const Message: VFC = memo(() => {
                     },
                   ],
             );
+          } else if (change.type === 'modified') {
             setMessageList((prevArray) => [
-              ...prevArray.filter(
-                (element, index, self) =>
-                  self.findIndex((e) => e.id === element.id) === index,
-              ),
+              {
+                id: change.doc.id,
+                type: change.doc.data().type as string,
+                recId: change.doc.data().recId as string,
+                recName: change.doc.data().recName as string,
+                recAvatar: change.doc.data().recAvatar as string,
+                read: change.doc.data().read as boolean,
+                updateAt: viewDateTime(change.doc.data().updateAt),
+                text: change.doc.data().text as string,
+                roomId: change.doc.data().roomId as string,
+              },
+              ...prevArray,
             ]);
           }
+          setMessageList((prevArray) => [
+            ...prevArray.filter(
+              (element, index, self) =>
+                self.findIndex((e) => e.id === element.id) === index,
+            ),
+          ]);
+          setLoading(false);
         });
       });
 
@@ -146,7 +167,7 @@ const Message: VFC = memo(() => {
       void getMessages();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [location]);
 
   const switchMessageType = (message: Notification) => {
     switch (message.type) {
@@ -175,6 +196,27 @@ const Message: VFC = memo(() => {
             read={message.read}
             updateAt={message.updateAt}
             roomId={message.roomId}
+          />
+        );
+      case 'newGroupMessage':
+        return (
+          <NewGroupMessageNotice
+            key={message.id}
+            text={message.text}
+            recName={message.recName}
+            read={message.read}
+            updateAt={message.updateAt}
+            roomId={message.roomId as string}
+          />
+        );
+      case 'recruitCancel':
+        return (
+          <RecruitCancelNotice
+            key={message.id}
+            id={id as string}
+            recName={message.recName}
+            updateAt={message.updateAt}
+            roomId={message.roomId as string}
           />
         );
       default:

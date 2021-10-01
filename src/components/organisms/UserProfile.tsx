@@ -48,7 +48,7 @@ const UserProfile: VFC<Props> = memo(({ userId }) => {
         let playTitle: string | Array<PlayTitle> = '';
         if (Array.isArray(doc.data()?.playTitle)) {
           playTitle = doc.data()?.playTitle as Array<PlayTitle>;
-        } else if (doc.data()) {
+        } else if (!doc.exists) {
           playTitle = [''];
         } else {
           const stringPlayTitle = doc.data()?.playTitle as string;

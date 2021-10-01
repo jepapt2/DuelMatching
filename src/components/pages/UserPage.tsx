@@ -16,7 +16,7 @@ const UserPage: VFC = memo(() => {
       <Flex>
         <Icon
           as={ArrowBackIcon}
-          boxSize="55px"
+          boxSize="50px"
           color="link"
           onClick={() => history.goBack()}
           cursor="pointer"
