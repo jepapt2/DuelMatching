@@ -18,13 +18,12 @@ const NewGroupMessageNotice: VFC<Props> = memo((props) => {
   return (
     <>
       <Box
-        paddingY="5px"
-        paddingX="10px"
+        padding="5px"
         cursor="pointer"
         onClick={() => history.push(`/group/${roomId}`)}
       >
         <Flex marginBottom="2">
-          <Box marginLeft="1">
+          <Box>
             <Text fontWeight="semibold">{recName}</Text>
             <Text color="gray.600">
               {text && text.length > 45 ? `${text.substr(0, 45)}...` : text}

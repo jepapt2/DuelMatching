@@ -1,5 +1,5 @@
 import { memo, useContext, useEffect, useState, VFC } from 'react';
-import { Spinner, VStack, Alert, AlertIcon } from '@chakra-ui/react';
+import { Spinner, VStack, Alert, AlertIcon, Box } from '@chakra-ui/react';
 import InfiniteScroll from 'react-infinite-scroller';
 import firebase from 'firebase';
 import { db } from '../../firebase';
@@ -95,24 +95,27 @@ const Join: VFC = memo(() => {
           <NoticeTabs index={2} />
 
           {recruitList.length ? (
-            <InfiniteScroll
-              pageStart={0}
-              loadMore={getFriends}
-              hasMore={oldestId !== recruitList[recruitList.length - 1].id}
-            >
-              <VStack spacing={4} align="stretch">
-                {recruitList.map((recruit) => (
-                  <JoinRecruitCard
-                    key={recruit.id}
-                    id={recruit.id}
-                    title={recruit.title}
-                    start={recruit.start}
-                    limit={recruit.limit}
-                    cancel={recruit.cancel}
-                  />
-                ))}
-              </VStack>
-            </InfiniteScroll>
+            <>
+              <InfiniteScroll
+                pageStart={0}
+                loadMore={getFriends}
+                hasMore={oldestId !== recruitList[recruitList.length - 1].id}
+              >
+                <VStack spacing={4} align="stretch">
+                  {recruitList.map((recruit) => (
+                    <JoinRecruitCard
+                      key={recruit.id}
+                      id={recruit.id}
+                      title={recruit.title}
+                      start={recruit.start}
+                      limit={recruit.limit}
+                      cancel={recruit.cancel}
+                    />
+                  ))}
+                </VStack>
+              </InfiniteScroll>
+              <Box height="100px" />
+            </>
           ) : (
             <Alert status="warning" marginTop="100px">
               <AlertIcon />

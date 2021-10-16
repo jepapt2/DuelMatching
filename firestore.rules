@@ -1,9 +1,111 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if
-          request.time < timestamp.date(2021, 8, 8);
+
+    function isAuthenticated() {
+      return request.auth != null;
     }
+
+    function isUserAuthenticated(userID) {
+      return request.auth.uid == userID;
+    }
+
+    function incomingData() {
+      return request.resource.data;
+    }
+
+    function existingData() {
+      return resource.data;
+    }
+
+    function validateString(text, min, max) {
+      return text is string
+        && min <= text.size()
+        && text.size() <= max;
+    }
+    
+    function validateNumber(num, min, max) {
+      return num is number
+        && min <= num
+        && num <= max;
+		}
+    
+    function documentPath(paths) {
+      return path([
+        ['databases', database, 'documents'].join('/'),
+        paths.join('/')
+        ].join('/')
+      );
+    }
+
+    match /users/{userId}{
+      allow get: if true
+      allow list: if true
+      allow update: if isUserAuthenticated(resource.id)
+        &&  validateString(incomingData().name,1,15)
+        &&  validateString(incomingData().comment,0,30)
+        &&  validateString(incomingData().introduction,0,1000)
+        &&  validateString(incomingData().favorite,0,15)
+        &&  validateString(incomingData().activityDay,0,10)
+        &&  validateString(incomingData().activityTime,0,10)
+        &&  validateString(incomingData().age,0,5)
+        &&  validateString(incomingData().sex,0,10)
+        &&  incomingData().playTitle.size() != 0
+        
+        match /friends/{friendId}{
+        allow get, list, delete: if isUserAuthenticated(userId)
+        }
+        
+        match /notifications/{noticeId}{
+        allow get, list, update, delete: if isUserAuthenticated(userId)
+        
+        }
+    }
+    
+    match /groups/{groupId}{
+    	allow	get, list: if isAuthenticated()
+    	allow create: if isAuthenticated()
+    		&&	validateString(incomingData().title,1,30)
+        &&	validateString(incomingData().format,0,15)
+        &&	validateString(incomingData().point,1,50)
+        &&	validateString(incomingData().overview,0,1000)
+        &&  incomingData().place != null
+        &&  incomingData().recruitNumber != null
+        &&	incomingData().friendOnly != null
+        &&	incomingData().start != null
+        &&	incomingData().end != null
+        &&	incomingData().limit != null
+        &&	incomingData().organizerId != null
+        &&	incomingData().full != null
+        &&	incomingData().createdAt != null
+        &&	incomingData().cancel != null
+        &&  validateNumber(incomingData().recruitNumber,1,15)
+        &&	incomingData().friendOnly is bool
+        &&	incomingData().start is timestamp
+        ||	incomingData().start == ''
+        &&	incomingData().end is timestamp
+        &&	incomingData().limit is timestamp
+        ||	incomingData().limit == ''
+        &&	incomingData().organizerId is string
+        &&	incomingData().full is bool
+        &&	incomingData().createdAt is timestamp
+        &&	incomingData().friendOnly is bool
+        &&	incomingData().cancel is bool
+        &&	incomingData().memberCount == 0
+        
+      match /members/{memberId}{
+      	allow create: if isAuthenticated()
+        allow create: if get(documentPath(['groups', groupId]).data == true)
+        allow get, list: if isAuthenticated()
+         ||	exists(documentPath(['users',documentPath(['groups', groupId]).data.organizerId),'friends',request.auth.uid]))
+      }
+    }
+    
+    match /requests/{requestId}{
+    	allow create,update: if isAuthenticated()
+    }
+    
+    match /{paths=**}/members/{memberId} {
+  		allow list: if isAuthenticated()
+		}
   }
-}

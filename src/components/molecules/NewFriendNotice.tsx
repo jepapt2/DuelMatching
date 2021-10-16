@@ -11,12 +11,11 @@ type Props = {
   recId: string;
   recName: string;
   recAvatar: string;
-  read: boolean;
   updateAt: string;
 };
 
 const NewFriendNotice: VFC<Props> = memo((props) => {
-  const { id, name, avatar, recId, recName, recAvatar, read, updateAt } = props;
+  const { id, name, avatar, recId, recName, recAvatar, updateAt } = props;
   const history = useHistory();
 
   useEffect(() => {
@@ -88,18 +87,6 @@ const NewFriendNotice: VFC<Props> = memo((props) => {
       <Box padding="5px">
         <Flex marginBottom="1">
           <Text marginBottom="1">{recName}さんとフレンド登録成立しました</Text>
-          {!read && (
-            <>
-              <Spacer />
-              <Box
-                borderRadius="full"
-                bg="link"
-                height="15px"
-                width="15px"
-                marginLeft="auto"
-              />
-            </>
-          )}
         </Flex>
         <Flex marginBottom="1">
           <Avatar

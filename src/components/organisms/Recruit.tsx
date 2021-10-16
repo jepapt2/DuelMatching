@@ -3,6 +3,13 @@ import {
   Avatar,
   Box,
   Button,
+  Popover,
+  PopoverArrow,
+  PopoverBody,
+  PopoverCloseButton,
+  PopoverContent,
+  PopoverHeader,
+  PopoverTrigger,
   Table,
   Tbody,
   Td,
@@ -239,50 +246,84 @@ const RecruitProfile: VFC<Props> = memo(
       }
       if (userId === recruit.organizerId) {
         return (
-          <Button
-            marginTop="30px"
-            width="100%"
-            bg="link"
-            color="primary"
-            onClick={recruitCansel}
-            marginBottom="100px"
-            _active={{
-              bg: 'link',
-              transform: 'scale(0.98)',
-            }}
-            _focus={{
-              bg: 'link',
-            }}
-            _hover={{
-              bg: 'link',
-            }}
-          >
-            募集をキャンセルする
-          </Button>
+          <Popover>
+            <PopoverTrigger>
+              <Button
+                marginTop="30px"
+                width="100%"
+                bg="primary"
+                color="link"
+                marginBottom="100px"
+                _active={{
+                  bg: 'primary',
+                  transform: 'scale(0.98)',
+                }}
+                _focus={{
+                  bg: 'primary',
+                }}
+                _hover={{
+                  bg: 'primary',
+                }}
+              >
+                募集をキャンセルする
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent width="220px">
+              <PopoverArrow />
+              <PopoverCloseButton />
+              <PopoverHeader textAlign="center">本当に？</PopoverHeader>
+              <PopoverBody textAlign="center">
+                <Button
+                  display="inline-block"
+                  colorScheme="red"
+                  onClick={recruitCansel}
+                >
+                  キャンセルする
+                </Button>
+              </PopoverBody>
+            </PopoverContent>
+          </Popover>
         );
       }
       if (members.map((obj) => obj.id).includes(userId as string)) {
         return (
-          <Button
-            marginTop="30px"
-            width="100%"
-            bg="link"
-            color="primary"
-            onClick={deleteMember}
-            marginBottom="100px"
-            _active={{
-              bg: 'link',
-              transform: 'scale(0.98)',
-            }}
-            _focus={{
-              bg: 'link',
-            }}
-            _hover={{
-              bg: 'link',
-            }}
-          >
-            募集を抜ける
-          </Button>
+          <Popover>
+            <PopoverTrigger>
+              <Button
+                marginTop="30px"
+                width="100%"
+                bg="primary"
+                color="link"
+                marginBottom="100px"
+                _active={{
+                  bg: 'primary',
+                  transform: 'scale(0.98)',
+                }}
+                _focus={{
+                  bg: 'primary',
+                }}
+                _hover={{
+                  bg: 'primary',
+                }}
+              >
+                募集から抜ける
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent width="220px">
+              <PopoverArrow />
+              <PopoverCloseButton />
+              <PopoverHeader textAlign="center">本当に？</PopoverHeader>
+              <PopoverBody textAlign="center">
+                <Button
+                  display="inline-block"
+                  colorScheme="red"
+                  onClick={deleteMember}
+                >
+                  抜ける
+                </Button>
+              </PopoverBody>
+            </PopoverContent>
+          </Popover>
         );
       }
       if (limit < new Date().getTime()) {

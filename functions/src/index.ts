@@ -70,23 +70,6 @@ export const onCreateRequest = functions.firestore
       });
   });
 
-export const onUpdateRequest = functions.firestore
-  .document('/requests/{requestId}')
-  .onUpdate(async (requestRecord) => {
-    db.collection('users')
-      .doc(requestRecord.after.data().recId)
-      .collection('notifications')
-      .doc(`${requestRecord.after.data().sendId}_friendReq`)
-      .set({
-        type: 'friendRequest',
-        recId: requestRecord.after.data().sendId,
-        recName: requestRecord.after.data().sendName,
-        recAvatar: requestRecord.after.data().sendAvatar,
-        read: false,
-        updateAt: new Date(),
-      });
-  });
-
 export const onCreateFriend = functions.firestore
   .document('/users/{userId}/friends/{friendId}')
   .onCreate(async (userRecord, context) => {
@@ -202,6 +185,68 @@ export const onCancelRecruit = functions.firestore
     }
   });
 
+export const onFriendCreate = functions.firestore
+  .document('/requests/{requestId}')
+  .onUpdate(async (change, context) => {
+    const recProfile = await db
+      .collection('users')
+      .doc(change.after.data().recId)
+      .get()
+      .then((doc) => ({
+        id: doc.id,
+        name: doc.data()?.name,
+        avatar: doc.data()?.avatar,
+      }));
+
+    const sendProfile = await db
+      .collection('users')
+      .doc(change.after.data().sendId)
+      .get()
+      .then((doc) => ({
+        id: doc.id,
+        name: doc.data()?.name,
+        avatar: doc.data()?.avatar,
+      }));
+    if (change.after.data().permission) {
+      db.collection('users')
+        .doc(recProfile.id)
+        .collection('friends')
+        .doc(sendProfile.id)
+        .set({
+          name: sendProfile.name,
+          avatar: sendProfile.avatar,
+          uid: sendProfile.id,
+          createdAt: new Date(),
+        });
+      db.collection('users')
+        .doc(sendProfile.id)
+        .collection('friends')
+        .doc(recProfile.id)
+        .set({
+          name: recProfile.name,
+          avatar: recProfile.avatar,
+          uid: recProfile.id,
+          createdAt: new Date(),
+        });
+
+      db.collection('requests').doc(context.params.requestId).delete();
+      db.collection('users')
+        .doc(recProfile.id)
+        .collection('notifications')
+        .doc(`${sendProfile.id}_friendReq`)
+        .delete();
+    }
+
+    if (change.after.data().rejection) {
+      db.collection('requests').doc(context.params.requestId).delete();
+      db.collection('users')
+        .doc(recProfile.id)
+        .collection('notifications')
+        .doc(`${sendProfile.id}_friendReq`)
+        .delete();
+    }
+  });
+
 export const onJoinMember = functions.firestore
   .document('/groups/{groupId}/members/{memberId}')
   .onCreate(async (snap, context) => {
@@ -262,4 +307,49 @@ export const onChangeUserName = functions.firestore
 
       await batch.commit();
     }
+  });
+
+export const onChangeUserAvatar = functions.firestore
+  .document('/users/{userId}')
+  .onUpdate(async (change, context) => {
+    if (change.before.data().avatar !== change.after.data().avatar) {
+      const batch = db.batch();
+
+      const membersDocref = db
+        .collectionGroup('members')
+        .where('uid', '==', context.params.userId);
+
+      (await membersDocref.get()).docs.map((doc) =>
+        batch.update(doc.ref, { avatar: change.after.data().avatar }),
+      );
+
+      const partnersDocref = db
+        .collectionGroup('partners')
+        .where('uid', '==', context.params.userId);
+
+      (await partnersDocref.get()).docs.map((doc) =>
+        batch.update(doc.ref, { avatar: change.after.data().avatar }),
+      );
+
+      const friendsDocref = db
+        .collectionGroup('friends')
+        .where('uid', '==', context.params.userId);
+
+      (await friendsDocref.get()).docs.map((doc) =>
+        batch.update(doc.ref, { avatar: change.after.data().avatar }),
+      );
+
+      await batch.commit();
+    }
+  });
+
+export const onDeleteFriend = functions.firestore
+  .document('/users/{userId}/friends/{friendId}')
+  .onDelete(async (snap, context) => {
+    await db
+      .collection('users')
+      .doc(context.params.friendId)
+      .collection('friends')
+      .doc(context.params.userId)
+      .delete();
   });

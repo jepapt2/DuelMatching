@@ -24,7 +24,7 @@ export const useLogin: () => (
               }
             });
         } else {
-          history.push('/login');
+          history.push('/notice');
         }
       });
   };
@@ -38,4 +38,13 @@ export const useLogout = (): (() => void) => {
   };
 
   return logout;
+};
+
+export const useDeleteUser = (): (() => void) => {
+  const deleteUser = auth.currentUser;
+  const deleteAuthUser = () => {
+    void deleteUser?.delete();
+  };
+
+  return deleteAuthUser;
 };

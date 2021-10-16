@@ -309,7 +309,7 @@ const Edit: VFC = memo(() => {
               </FormLabel>
               <Input
                 bg="secondary"
-                id="favorite"
+                id="activityDay"
                 defaultValue={inputValue.activityDay}
                 {...register('activityDay', {
                   maxLength: {

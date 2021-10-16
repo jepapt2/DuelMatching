@@ -2,8 +2,6 @@ import { memo, useContext, VFC } from 'react';
 import { Redirect, Route } from 'react-router-dom';
 
 import { AuthContext } from '../components/providers/AuthContext';
-
-import Login from '../components/pages/Login';
 import Menu from '../components/molecules/Menu';
 
 import ProfileRouter from './PriofileRouter';
@@ -27,7 +25,6 @@ const PrivateRouter: VFC = memo(() => {
         <Redirect to="/" />
       ) : (
         <>
-          <Route path="/login" component={Login} />
           <Route exact path="/users" component={Users} />
           <Route exact path="/user/:id" component={UserPage} />
           <Route exact path="/recruits" component={Recruits} />

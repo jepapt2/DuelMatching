@@ -1,5 +1,5 @@
 import { memo, useContext, useEffect, useState, VFC } from 'react';
-import { Spinner, VStack, Alert, AlertIcon } from '@chakra-ui/react';
+import { VStack, Alert, AlertIcon, Spinner } from '@chakra-ui/react';
 import InfiniteScroll from 'react-infinite-scroller';
 import { useLocation } from 'react-router-dom';
 import { db } from '../../firebase';
@@ -176,12 +176,9 @@ const Message: VFC = memo(() => {
           <FriendRequestNotice
             key={message.id}
             id={id as string}
-            name={name as string}
-            avatar={avatar as string}
             recId={message.recId}
             recName={message.recName}
             recAvatar={message.recAvatar}
-            read={message.read}
             updateAt={message.updateAt}
           />
         );
@@ -229,7 +226,6 @@ const Message: VFC = memo(() => {
             recId={message.recId}
             recName={message.recName}
             recAvatar={message.recAvatar}
-            read={message.read}
             updateAt={message.updateAt}
           />
         );

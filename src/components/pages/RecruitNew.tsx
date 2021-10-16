@@ -171,7 +171,7 @@ const RecruitNew: VFC = memo(() => {
               {...register('format', {
                 maxLength: {
                   value: 15,
-                  message: '対戦形式は10文字までです',
+                  message: '対戦形式は15文字までです',
                 },
               })}
             />
@@ -211,7 +211,7 @@ const RecruitNew: VFC = memo(() => {
               bg="secondary"
               {...register('point', {
                 required: '詳細な場所は必ず入力してください',
-                maxLength: { value: 30, message: '詳細な場所は30文字までです' },
+                maxLength: { value: 50, message: '詳細な場所は50文字までです' },
               })}
             />
             <FormErrorMessage>

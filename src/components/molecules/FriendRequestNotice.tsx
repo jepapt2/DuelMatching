@@ -8,17 +8,14 @@ import SecondaryButton from '../atom/SecondaryButton';
 
 type Props = {
   id: string;
-  name: string;
-  avatar: string;
   recId: string;
   recName: string;
   recAvatar: string;
-  read: boolean;
   updateAt: string;
 };
 
 const FriendRequestNotice: VFC<Props> = memo((props) => {
-  const { id, name, avatar, recId, recName, recAvatar, read, updateAt } = props;
+  const { id, recId, recName, recAvatar, updateAt } = props;
   const [display, setDisplay] = useState<boolean>(true);
   const history = useHistory();
 
@@ -39,33 +36,17 @@ const FriendRequestNotice: VFC<Props> = memo((props) => {
   }, []);
 
   const onClickPermission = async () => {
-    await db.collection('users').doc(id).collection('friends').doc(recId).set({
-      name: recName,
-      avatar: recAvatar,
-      createdAt: new Date(),
+    await db.collection('requests').doc(`${recId}_${id}`).update({
+      permission: true,
     });
-    await db.collection('users').doc(recId).collection('friends').doc(id).set({
-      name,
-      avatar,
-      createdAt: new Date(),
-    });
-    void db
-      .collection('users')
-      .doc(id)
-      .collection('notifications')
-      .doc(`${recId}_friendReq`)
-      .delete();
     setDisplay(false);
   };
 
   const onClickRejection = async () => {
-    await db
-      .collection('users')
-      .doc(id)
-      .collection('notifications')
-      .doc(`${recId}_friendReq`)
-      .delete();
     setDisplay(false);
+    await db.collection('requests').doc(`${recId}_${id}`).update({
+      rejection: true,
+    });
   };
 
   return (
@@ -73,15 +54,6 @@ const FriendRequestNotice: VFC<Props> = memo((props) => {
       {display && (
         <>
           <Box padding="5px">
-            {!read && (
-              <Box
-                borderRadius="full"
-                bg="link"
-                height="15px"
-                width="15px"
-                marginLeft="auto"
-              />
-            )}
             <Text marginBottom="1">{recName}さんからのフレンド申請です</Text>
             <Flex marginBottom="1">
               <Avatar

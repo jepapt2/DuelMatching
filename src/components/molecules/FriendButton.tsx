@@ -11,7 +11,6 @@ import {
   PopoverContent,
   PopoverHeader,
   PopoverTrigger,
-  Spinner,
   Button,
 } from '@chakra-ui/react';
 import { useState, memo, useEffect, VFC } from 'react';
@@ -63,6 +62,8 @@ const FriendButton: VFC<Props> = memo((props) => {
           sendName,
           sendAvatar,
           recId,
+          permission: false,
+          rejection: false,
           updateAt: new Date(),
         });
     } catch {
@@ -80,8 +81,6 @@ const FriendButton: VFC<Props> = memo((props) => {
   };
 
   const onClickFriendDelete = async () => {
-    let toastTitle = 'フレンドから削除しました';
-    let toastStatus: AlertStatus = 'success';
     try {
       await db
         .collection('users')
@@ -89,20 +88,10 @@ const FriendButton: VFC<Props> = memo((props) => {
         .collection('friends')
         .doc(recId)
         .delete();
-
-      await db
-        .collection('users')
-        .doc(recId)
-        .collection('friends')
-        .doc(sendId)
-        .delete();
-    } catch {
-      toastTitle = 'フレンド削除に失敗しました';
-      toastStatus = 'error';
     } finally {
       toast({
-        title: toastTitle,
-        status: toastStatus,
+        title: 'フレンドから削除しました',
+        status: 'success',
         position: 'top',
         duration: 9000,
         isClosable: true,
@@ -129,6 +118,8 @@ const FriendButton: VFC<Props> = memo((props) => {
               borderRadius="3xl"
               padding="2px"
               width="75px"
+              borderColor="link"
+              border="2px"
             >
               <Icon
                 as={FaUserMinus}
@@ -144,9 +135,7 @@ const FriendButton: VFC<Props> = memo((props) => {
           <PopoverContent width="220px">
             <PopoverArrow />
             <PopoverCloseButton />
-            <PopoverHeader textAlign="center">
-              本当に削除しますか？
-            </PopoverHeader>
+            <PopoverHeader textAlign="center">本当に？</PopoverHeader>
             <PopoverBody textAlign="center">
               <Button
                 display="inline-block"
@@ -188,14 +177,6 @@ const FriendButton: VFC<Props> = memo((props) => {
     );
   };
 
-  return (
-    <>
-      {loading ? (
-        <Spinner marginY="auto" marginRight="20px" textAlign="center" />
-      ) : (
-        renderButton()
-      )}
-    </>
-  );
+  return <>{loading || renderButton()}</>;
 });
 export default FriendButton;

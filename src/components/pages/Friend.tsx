@@ -125,7 +125,7 @@ const Friend: VFC = memo(() => {
           ) : (
             <Alert status="warning" marginTop="100px">
               <AlertIcon />
-              通知はまだありません
+              フレンドはまだいません
             </Alert>
           )}
         </>

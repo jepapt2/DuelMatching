@@ -291,7 +291,7 @@ const GroupChat: VFC = memo(() => {
                     onClick={() => history.push(`/recruit/${groupId}`)}
                     cursor="pointer"
                     display="inline-block"
-                    marginRight="10px"
+                    marginRight="30px"
                   >
                     {title && title.length > 10
                       ? `${title.substr(0, 10)}...`

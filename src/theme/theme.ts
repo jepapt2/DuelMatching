@@ -22,6 +22,19 @@ const theme = extendTheme({
       },
     },
   },
+  components: {
+    Spinner: {
+      baseStyle: {
+        position: 'absolute',
+        height: '40px',
+        width: '40px',
+        margin: 'auto',
+        top: '200',
+        right: '0',
+        left: '0',
+      },
+    },
+  },
 });
 
 export default theme;
