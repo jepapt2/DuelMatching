@@ -15,10 +15,14 @@ import {
   ModalCloseButton,
   ModalContent,
   ModalHeader,
+  Table,
+  Tbody,
+  Td,
+  Tr,
+  Center,
 } from '@chakra-ui/react';
 import { memo, VFC, useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
-import TopBg from '../../image/TopBg.png';
 import TopProfile from '../../image/TopProfile.png';
 import TopRecruit from '../../image/TopRecruit.png';
 import TopChat from '../../image/TopChat.png';
@@ -39,14 +43,7 @@ const Top: VFC = memo(() => {
 
   return (
     <>
-      <Box
-        bg="secondary"
-        m={0}
-        backgroundImage={TopBg}
-        backgroundSize="170px"
-        backgroundPosition="95% 95%"
-        backgroundRepeat="no-repeat"
-      >
+      <Box bg="secondary" m={0} backgroundSize="170px" paddingBottom="40px">
         <Heading as="h1" size="2xl" display="inline-block" bg="link">
           DuelMatching
         </Heading>
@@ -125,34 +122,62 @@ const Top: VFC = memo(() => {
           marginTop="2em"
           marginX="5px"
         >
-          <VStack w="100%" bg="primary" borderRadius="lg" padding="2px">
+          <VStack
+            w="100%"
+            bg="primary"
+            borderRadius="lg"
+            padding="2px"
+            onClick={() => onOpenImage(TopProfile, '充実したプロフィール')}
+            cursor="pointer"
+          >
             <Text fontWeight="bold" marginTop="10px">
               充実したプロフィール
             </Text>
-            <Image
-              src={TopProfile}
-              onClick={() => onOpenImage(TopProfile, '充実したプロフィール')}
-            />
+            <Image src={TopProfile} />
           </VStack>
-          <VStack w="100%" bg="primary" borderRadius="lg" padding="2px">
+          <VStack
+            w="100%"
+            bg="primary"
+            borderRadius="lg"
+            padding="2px"
+            onClick={() => onOpenImage(TopRecruit, '対戦募集機能')}
+            cursor="pointer"
+          >
             <Text fontWeight="bold" marginTop="10px">
               対戦募集機能
             </Text>
-            <Image
-              src={TopRecruit}
-              onClick={() => onOpenImage(TopRecruit, '対戦募集機能')}
-            />
+            <Image src={TopRecruit} />
           </VStack>
-          <VStack w="100%" bg="primary" borderRadius="lg" padding="2px">
+          <VStack
+            w="100%"
+            bg="primary"
+            borderRadius="lg"
+            padding="2px"
+            onClick={() => onOpenImage(TopChat, '複数人対応のチャット')}
+            cursor="pointer"
+          >
             <Text fontWeight="bold" marginTop="10px">
               複数人対応のチャット
             </Text>
-            <Image
-              src={TopChat}
-              onClick={() => onOpenImage(TopChat, '複数人対応のチャット')}
-            />
+            <Image src={TopChat} />
           </VStack>
         </Grid>
+        <Box bg="primary" borderRadius="lg" marginY="2em" marginX="5px">
+          <Center>
+            <Heading size="sm" marginTop="10px">
+              更新履歴
+            </Heading>
+          </Center>
+
+          <Table>
+            <Tbody>
+              <Tr>
+                <Td>2021/10/25</Td>
+                <Td>DuelMatchingリリース</Td>
+              </Tr>
+            </Tbody>
+          </Table>
+        </Box>
       </Box>
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
